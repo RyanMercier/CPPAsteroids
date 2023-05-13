@@ -25,8 +25,9 @@ double asteroidUpdateTime = 0.1; // how many seconds between checking if another
 
 void Initialize()
 {
+    SetConfigFlags(FLAG_VSYNC_HINT);
     InitWindow(screenWidth, screenHeight, "C++ Asteroids by Ryan Mercier");
-    SetTargetFPS(60);
+    // SetTargetFPS(60);
 
     backgroundColor = Color{0, 0, 0, 0};
     Vector2 startPosition = (Vector2){screenWidth / 2, screenHeight / 2};
