@@ -1,0 +1,5 @@
+*.exe
+*.dsym
+.vscode
+*.code-workspace
+main
