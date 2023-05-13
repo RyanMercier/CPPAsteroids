@@ -8,16 +8,20 @@ class Asteroid
 {
     bool alive = true;
     Vector2 position;
+    float direction;
+    float speed;
     Vector2 velocity;
     float radius = 1.5;
     float rotation;
 
 public:
-    Asteroid(Vector2 _position, float _direction, float speed, float _radius)
+    Asteroid(Vector2 _position, float _direction, float _speed, float _radius)
     {
         position = _position;
-        velocity.x += speed * cos(_direction * PI / 180);
-        velocity.y += speed * sin(_direction * PI / 180);
+        direction = _direction;
+        velocity.x += _speed * cos(_direction * PI / 180);
+        velocity.y += _speed * sin(_direction * PI / 180);
+        speed = _speed;
         radius = _radius;
         rotation = GetRandomValue(0, 1800) / 10;
     }
@@ -25,6 +29,16 @@ public:
     Vector2 GetPosition()
     {
         return position;
+    }
+
+    float GetDirection()
+    {
+        return direction;
+    }
+
+    float GetSpeed()
+    {
+        return speed;
     }
 
     float GetRadius()

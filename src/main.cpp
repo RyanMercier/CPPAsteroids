@@ -50,6 +50,7 @@ void HandleAsteroids()
         std::chrono::duration<double> elapsed_seconds = currentTime - lastAsteroidTime;
         if (elapsed_seconds.count() >= asteroidUpdateTime)
         {
+            // make sure to spawn out of bounds
             int xPos = GetRandomValue(-50, screenWidth + 50);
             int yPos = GetRandomValue(-50, screenHeight + 50);
             while ((xPos > 0 && xPos < screenWidth) && (yPos > 0 && yPos < screenHeight))
@@ -78,6 +79,14 @@ void HandleAsteroids()
             {
                 (*i)->SetAlive(false);
                 p->SetAlive(false);
+
+                // handle splitting
+                if (asteroidRadius > 20)
+                {
+                    asteroids.push_back(new Asteroid((*i)->GetPosition(), (*i)->GetDirection() + GetRandomValue(-45, 45), (*i)->GetSpeed(), (*i)->GetRadius() / 2));
+                    asteroids.push_back(new Asteroid((*i)->GetPosition(), (*i)->GetDirection() + GetRandomValue(-45, 45), (*i)->GetSpeed(), (*i)->GetRadius() / 2));
+                }
+
                 score++;
             }
         }
