@@ -139,6 +139,9 @@ void Ship::Update()
 
 void Ship::Draw()
 {
-    std::vector<Vector2> verts = GetVertices();
-    DrawTriangleLines(verts[0], verts[1], verts[2], RAYWHITE);
+    if (alive)
+    {
+        std::vector<Vector2> verts = GetVertices();
+        DrawTriangleLines(verts[0], verts[1], verts[2], RAYWHITE);
+    }
 }

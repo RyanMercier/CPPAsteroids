@@ -63,7 +63,7 @@ public:
         int screenWidth = GetScreenWidth();
         int screenHeight = GetScreenHeight();
 
-        if (position.x < -100 || position.x > screenWidth + 100 || position.y < -100 || position.y > screenHeight + 100)
+        if (position.x < -150 || position.x > screenWidth + 150 || position.y < -150 || position.y > screenHeight + 150)
         {
             alive = false;
         }

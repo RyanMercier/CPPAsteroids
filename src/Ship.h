@@ -18,7 +18,7 @@ class Ship
     const float maxSpeed = 500;
     const float acceleration = 200;
     const float dragAmount = 100;
-    const float rotationSpeed = 10;
+    const float rotationSpeed = 8;
 
     std::vector<Vector2> vertices = {(Vector2){10, 0}, (Vector2){-10, -8}, (Vector2){-10, 8}};
 
