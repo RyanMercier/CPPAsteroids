@@ -1,28 +1,35 @@
-#ifndef PROJECTILE_H
-#define PROJECTILE_H
+#ifndef ASTEROID_H
+#define ASTEROID_H
 
 #include "raylib.h"
 #include "raymath.h"
 
-class Projectile
+class Asteroid
 {
     bool alive = true;
     Vector2 position;
     Vector2 velocity;
-    float speed = 700;
     float radius = 1.5;
+    float rotation;
 
 public:
-    Projectile(Vector2 _position, float _direction)
+    Asteroid(Vector2 _position, float _direction, float speed, float _radius)
     {
         position = _position;
         velocity.x += speed * cos(_direction * PI / 180);
         velocity.y += speed * sin(_direction * PI / 180);
+        radius = _radius;
+        rotation = GetRandomValue(0, 1800) / 10;
     }
 
     Vector2 GetPosition()
     {
         return position;
+    }
+
+    float GetRadius()
+    {
+        return radius;
     }
 
     bool IsAlive()
@@ -42,7 +49,7 @@ public:
         int screenWidth = GetScreenWidth();
         int screenHeight = GetScreenHeight();
 
-        if (position.x < 0 || position.x > screenWidth || position.y < 0 || position.y > screenHeight)
+        if (position.x < -100 || position.x > screenWidth + 100 || position.y < -100 || position.y > screenHeight + 100)
         {
             alive = false;
         }
@@ -50,7 +57,7 @@ public:
 
     void Draw()
     {
-        DrawCircle(position.x, position.y, radius, RAYWHITE);
+        DrawPolyLines(position, 5 + (int)(radius / 5), radius, rotation, RAYWHITE);
     }
 };
 
