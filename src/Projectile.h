@@ -8,7 +8,7 @@ class Projectile
 {
     bool alive = true;
     Vector2 position;
-    Vector2 velocity;
+    Vector2 velocity = { 0, 0 };
     float speed = 700;
     float radius = 1.5;
 

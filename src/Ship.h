@@ -13,31 +13,31 @@ class Ship
     bool alive = true;
     Vector2 position;
     Vector2 velocity;
-    float rotation = 90;
-    const float baseSpeed = 20;
-    const float maxSpeed = 500;
-    const float acceleration = 200;
-    const float dragAmount = 100;
-    const float rotationSpeed = 650;
+    float rotation = 90.0f;
+    const float baseSpeed = 20.0f;
+    const float maxSpeed = 500.0f;
+    const float acceleration = 200.0f;
+    const float dragAmount = 100.0f;
+    const float rotationSpeed = 650.0f;
 
-    std::vector<Vector2> vertices = {(Vector2){10, 0}, (Vector2){-10, -8}, (Vector2){-10, 8}};
+    std::vector<Vector2> vertices = {Vector2{10, 0}, Vector2{-10, -8}, Vector2{-10, 8}};
 
     // bullet control
     float shotsPerSecond = 10;
-    std::chrono::_V2::system_clock::time_point lastShotTime = std::chrono::system_clock::now();
+    std::chrono::system_clock::time_point lastShotTime = std::chrono::system_clock::now();
     std::list<Projectile *> bullets;
 
 public:
     Ship()
     {
-        position = (Vector2){0, 0};
-        velocity = (Vector2){0, 0};
+        position = Vector2{0, 0};
+        velocity = Vector2{0, 0};
     }
 
     Ship(Vector2 _position)
     {
         position = _position;
-        velocity = (Vector2){0, 0};
+        velocity = Vector2{0, 0};
     }
 
     Ship(Ship &copy)

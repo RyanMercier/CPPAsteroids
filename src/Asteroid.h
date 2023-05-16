@@ -10,7 +10,7 @@ class Asteroid
     Vector2 position;
     float direction;
     float speed;
-    Vector2 velocity;
+    Vector2 velocity = {0, 0};
     float radius = 1.5;
     float rotation;
 

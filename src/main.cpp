@@ -12,7 +12,7 @@ Controller *controller;
 Ship *player;
 std::list<Asteroid *> asteroids;
 
-// Game Settings
+// Game Setting
 int score = 0;
 int lastDifficultyScore = 0;
 int maxAsteroids = 10;
@@ -20,7 +20,7 @@ double minAsteroidSpeed = 0.05;
 double maxAsteroidSpeed = 0.2;
 
 // Asteroid Control
-std::chrono::_V2::system_clock::time_point lastAsteroidTime = std::chrono::system_clock::now();
+std::chrono::system_clock::time_point lastAsteroidTime = std::chrono::system_clock::now();
 double asteroidUpdateTime = 0.1; // how many seconds between checking if another asteroid is neccessary
 
 void Initialize()
@@ -30,7 +30,7 @@ void Initialize()
     // SetTargetFPS(60);
 
     backgroundColor = Color{0, 0, 0, 0};
-    Vector2 startPosition = (Vector2){screenWidth / 2, screenHeight / 2};
+    Vector2 startPosition = Vector2{screenWidth / 2, screenHeight / 2};
     player = new Ship(startPosition);
     controller = new Controller(player);
 }
@@ -53,15 +53,15 @@ void HandleAsteroids(float _deltaTime)
         if (elapsed_seconds.count() >= asteroidUpdateTime)
         {
             // make sure to spawn out of bounds
-            int xPos = GetRandomValue(-100, screenWidth + 100);
-            int yPos = GetRandomValue(-100, screenHeight + 100);
+            float xPos = GetRandomValue(-100, screenWidth + 100);
+            float yPos = GetRandomValue(-100, screenHeight + 100);
             while ((xPos > -50 && xPos < screenWidth + 50) && (yPos > -50 && yPos < screenHeight + 50))
             {
                 xPos = GetRandomValue(-100, screenWidth + 100);
                 yPos = GetRandomValue(-100, screenHeight + 100);
             }
 
-            asteroids.push_back(new Asteroid((Vector2){xPos, yPos}, GetRandomValue(-90, 90), GetRandomValue(50, 300), GetRandomValue(10, 100)));
+            asteroids.push_back(new Asteroid(Vector2{xPos, yPos}, GetRandomValue(-90, 90), GetRandomValue(50, 300), GetRandomValue(10, 100)));
             lastAsteroidTime = currentTime;
         }
     }

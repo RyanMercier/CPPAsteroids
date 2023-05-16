@@ -14,9 +14,9 @@ void Ship::TurnRight(float _deltaTime)
 void Ship::Accelerate(float _deltaTime)
 {
     // Apply ship acceleration in the direction of its facing angle
-    Vector2 accelerationVector = (Vector2){
-        acceleration * cos(rotation * PI / 180),
-        acceleration * sin(rotation * PI / 180)};
+    Vector2 accelerationVector = Vector2{
+        acceleration * cosf(rotation * PI / 180),
+        acceleration * sinf(rotation * PI / 180)};
 
     velocity = Vector2Add(velocity, Vector2Scale(accelerationVector, _deltaTime));
 }
@@ -32,7 +32,7 @@ void Ship::Drag(float _deltaTime)
     // This prevents drag from causing the ship to move backwards
     if (Vector2Length(velocity) < 1)
     {
-        velocity = (Vector2){0.0f, 0.0f};
+        velocity = Vector2{0.0f, 0.0f};
     }
 }
 
