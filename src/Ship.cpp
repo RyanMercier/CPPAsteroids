@@ -1,32 +1,32 @@
 #include "Ship.h"
 
 // Actions
-void Ship::TurnLeft()
+void Ship::TurnLeft(float _deltaTime)
 {
-    Rotate(-rotationSpeed);
+    Rotate(-rotationSpeed * _deltaTime);
 }
 
-void Ship::TurnRight()
+void Ship::TurnRight(float _deltaTime)
 {
-    Rotate(rotationSpeed);
+    Rotate(rotationSpeed * _deltaTime);
 }
 
-void Ship::Accelerate()
+void Ship::Accelerate(float _deltaTime)
 {
     // Apply ship acceleration in the direction of its facing angle
     Vector2 accelerationVector = (Vector2){
         acceleration * cos(rotation * PI / 180),
         acceleration * sin(rotation * PI / 180)};
 
-    velocity = Vector2Add(velocity, Vector2Scale(accelerationVector, GetFrameTime()));
+    velocity = Vector2Add(velocity, Vector2Scale(accelerationVector, _deltaTime));
 }
 
-void Ship::Drag()
+void Ship::Drag(float _deltaTime)
 {
     // Apply negative acceleration in the direction of its movement angle
     Vector2 dragVector = Vector2Normalize(velocity);
     dragVector = Vector2Scale(dragVector, -dragAmount);
-    velocity = Vector2Add(velocity, Vector2Scale(dragVector, GetFrameTime()));
+    velocity = Vector2Add(velocity, Vector2Scale(dragVector, _deltaTime));
 
     // Check if velocity magnitude is less than threshold, and if so, set velocity to zero
     // This prevents drag from causing the ship to move backwards
@@ -36,12 +36,10 @@ void Ship::Drag()
     }
 }
 
-void Ship::Move()
+void Ship::Move(float _deltaTime)
 {
     if (Vector2Length(velocity) > 0)
     {
-        float deltaTime = GetFrameTime();
-
         // add base speed
         Vector2 moveVector = Vector2Normalize(velocity);
         moveVector = Vector2Scale(moveVector, baseSpeed);
@@ -50,7 +48,7 @@ void Ship::Move()
         // limit max speed
         moveVector = Vector2ClampValue(moveVector, 0, maxSpeed);
 
-        position = Vector2Add(position, Vector2Scale(moveVector, deltaTime));
+        position = Vector2Add(position, Vector2Scale(moveVector, _deltaTime));
     }
 }
 
@@ -70,7 +68,7 @@ void Ship::Shoot()
 
 // Helpers
 
-void Ship::HandleProjectiles()
+void Ship::HandleProjectiles(float _deltaTime)
 {
     std::list<Projectile *>::iterator i = bullets.begin();
     while (i != bullets.end())
@@ -82,7 +80,7 @@ void Ship::HandleProjectiles()
         }
         else
         {
-            (*i)->Update();
+            (*i)->Update(_deltaTime);
             (*i)->Draw();
             i++;
         }
@@ -129,12 +127,12 @@ std::vector<Vector2> Ship::GetVertices()
 
 // Update
 
-void Ship::Update()
+void Ship::Update(float _deltaTime)
 {
     HandleScreenWrap();
-    HandleProjectiles();
-    Drag();
-    Move();
+    HandleProjectiles(_deltaTime);
+    Drag(_deltaTime);
+    Move(_deltaTime);
 }
 
 void Ship::Draw()

@@ -4,3 +4,4 @@
 *.code-workspace
 main
 lib
+obj

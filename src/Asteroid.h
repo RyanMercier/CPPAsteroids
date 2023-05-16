@@ -56,9 +56,9 @@ public:
         alive = _alive;
     }
 
-    void Update()
+    void Update(float deltaTime)
     {
-        position = Vector2Add(position, Vector2Scale(velocity, GetFrameTime()));
+        position = Vector2Add(position, Vector2Scale(velocity, deltaTime));
 
         int screenWidth = GetScreenWidth();
         int screenHeight = GetScreenHeight();

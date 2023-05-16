@@ -27,7 +27,7 @@ public:
     {
     }
 
-    void Update();
+    void Update(float _deltaTime);
 };
 
 #endif

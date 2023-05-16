@@ -18,7 +18,7 @@ class Ship
     const float maxSpeed = 500;
     const float acceleration = 200;
     const float dragAmount = 100;
-    const float rotationSpeed = 8;
+    const float rotationSpeed = 650;
 
     std::vector<Vector2> vertices = {(Vector2){10, 0}, (Vector2){-10, -8}, (Vector2){-10, 8}};
 
@@ -104,23 +104,23 @@ public:
 
     std::vector<Vector2> GetVertices();
 
-    void Accelerate();
+    void Accelerate(float _deltaTime);
 
-    void Drag();
+    void Drag(float _deltaTime);
 
-    void Move();
+    void Move(float _deltaTime);
 
-    void TurnLeft();
+    void TurnLeft(float _deltaTime);
 
-    void TurnRight();
+    void TurnRight(float _deltaTime);
 
     void Shoot();
 
     void HandleScreenWrap();
 
-    void HandleProjectiles();
+    void HandleProjectiles(float _deltaTime);
 
-    void Update();
+    void Update(float _deltaTime);
 
     void Draw();
 };

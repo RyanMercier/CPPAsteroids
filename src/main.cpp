@@ -35,7 +35,7 @@ void Initialize()
     controller = new Controller(player);
 }
 
-void HandleAsteroids()
+void HandleAsteroids(float _deltaTime)
 {
     // Difficulty Control
     if (score >= lastDifficultyScore + 20)
@@ -67,7 +67,6 @@ void HandleAsteroids()
     }
 
     // Check for Collisions and Clean Up Asteroids
-    std::list<Asteroid *>::iterator i = asteroids.begin();
     for (auto i = asteroids.begin(); i != asteroids.end();)
     {
         if (!(*i)->IsAlive())
@@ -124,7 +123,7 @@ void HandleAsteroids()
                 }
             }
 
-            (*i)->Update();
+            (*i)->Update(_deltaTime);
             i++;
         }
     }
@@ -132,13 +131,15 @@ void HandleAsteroids()
 
 void Update()
 {
+    float deltaTime = GetFrameTime();
+
     if (player->IsAlive())
     {
-        controller->Update();
-        player->Update();
+        controller->Update(deltaTime);
+        player->Update(deltaTime);
     }
 
-    HandleAsteroids();
+    HandleAsteroids(deltaTime);
 }
 
 void Draw()
