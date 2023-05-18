@@ -11,8 +11,8 @@
 class Ship
 {
     bool alive = true;
-    Vector2 position;
-    Vector2 velocity;
+    Vector2 position = Vector2{0, 0};
+    Vector2 velocity = Vector2{0, 0};
     float rotation = 90.0f;
     const float baseSpeed = 20.0f;
     const float maxSpeed = 500.0f;

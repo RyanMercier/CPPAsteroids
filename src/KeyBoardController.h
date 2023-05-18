@@ -35,7 +35,7 @@ public:
             player->TurnRight(_deltaTime);
         }
 
-        if (IsKeyReleased(KEY_SPACE))
+        if (IsKeyDown(KEY_SPACE))
         {
             player->Shoot();
         }

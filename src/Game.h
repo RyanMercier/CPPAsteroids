@@ -17,7 +17,7 @@ class Game
     Color backgroundColor;
 
     // Asteroid Control
-    int maxAsteroids = 15;
+    int maxAsteroids = 20;
     int lastDifficultyScore = 0; // the last score max asteroids was increased at
     int scorePerDifficultyIncrease = 10;
     double minAsteroidSpeed = 0.05;
@@ -42,6 +42,7 @@ public:
     {
         Initialize();
         controller = _controller;
+        controller->player = player;
     }
 
     ~Game()
@@ -56,6 +57,11 @@ public:
     Ship *getPlayer()
     {
         return player;
+    }
+
+    std::list<Asteroid *> getAsteroids()
+    {
+        return asteroids;
     }
 
     int getScore()
@@ -76,13 +82,17 @@ public:
 
     int Run()
     {
-        while (!WindowShouldClose())
+        if (!WindowShouldClose())
         {
             Update();
             Draw();
         }
 
-        CloseWindow();
+        else
+        {
+            CloseWindow();
+        }
+
         return score;
     }
 
