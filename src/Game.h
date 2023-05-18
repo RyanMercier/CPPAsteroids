@@ -6,7 +6,7 @@
 #include <raylib.h>
 #include "Ship.h"
 #include "Asteroid.h"
-#include "Controller.h"
+#include "KeyBoardController.h"
 
 class Game
 {
@@ -17,7 +17,7 @@ class Game
     Color backgroundColor;
 
     // Asteroid Control
-    int maxAsteroids = 10;
+    int maxAsteroids = 15;
     int lastDifficultyScore = 0; // the last score max asteroids was increased at
     int scorePerDifficultyIncrease = 10;
     double minAsteroidSpeed = 0.05;
@@ -34,14 +34,14 @@ class Game
 public:
     Game()
     {
-        SetConfigFlags(FLAG_VSYNC_HINT);
-        InitWindow(screenWidth, screenHeight, "C++ Asteroids by Ryan Mercier");
-        // SetTargetFPS(60);
+        Initialize();
+        controller = new KeyBoardController(player);
+    }
 
-        backgroundColor = Color{0, 0, 0, 0};
-        Vector2 startPosition = Vector2{screenWidth / 2, screenHeight / 2};
-        player = new Ship(startPosition);
-        controller = new Controller(player);
+    Game(Controller *_controller)
+    {
+        Initialize();
+        controller = _controller;
     }
 
     ~Game()
@@ -61,6 +61,17 @@ public:
     int getScore()
     {
         return score;
+    }
+
+    void Initialize()
+    {
+        SetConfigFlags(FLAG_VSYNC_HINT);
+        InitWindow(screenWidth, screenHeight, "C++ Asteroids by Ryan Mercier");
+        // SetTargetFPS(60);
+
+        backgroundColor = Color{0, 0, 0, 0};
+        Vector2 startPosition = Vector2{screenWidth / 2.0f, screenHeight / 2.0f};
+        player = new Ship(startPosition);
     }
 
     int Run()
