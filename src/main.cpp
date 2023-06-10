@@ -1,52 +1,105 @@
+#include <vector>
+#include <random>
+#include <iostream>
 #include "raylib.h"
 #include "Game.h"
 #include "NetworkController.h"
+#include "NeuralNetwork.h"
+#include "Population.h"
 
-int rayCount = 48;
+int rayCount = 12;
+int numInputs = rayCount + 5;
+int numHidden = rayCount + 5;
+int numOutputs = 4;
+double mutationRate = 0.01;
+double crossoverRate = 0.7;
+int populationSize = 50;
+int numGenerations = 100;
 
 int main()
 {
-    NetworkController *controller = new NetworkController();
-    Game game = Game(controller);
-    Ship *player = game.getPlayer();
+    // Create initial population
+    Population population = Population(populationSize, numInputs, numHidden, numOutputs, mutationRate, crossoverRate);
 
-    BeginDrawing();
+    /////////// ADD SORTING AND A FITNESS FUNCTION!!!
 
-    while (!WindowShouldClose())
+    // Evolutionary loop
+    for (int generation = 0; generation < numGenerations; generation++)
     {
-        game.Run();
-
-        std::list<Asteroid *> asteroids = game.getAsteroids();
-        Vector2 playerPos = player->GetPosition();
-
-        // Raycast for network inputs
-        float deltaAngle = 360.0f / rayCount;
-
-        for (int i = 0; i < rayCount; i++)
+        // Evaluate fitness for each individual in the population
+        for (int i = 0; i < populationSize; i++)
         {
-            Vector3 rayVector = {cos(deltaAngle * i * PI / 180.0f), sin(deltaAngle * i * PI / 180.0f), 0};
-            Ray r = {{playerPos.x, playerPos.y, 0}, rayVector};
-            float shortestDistance = INFINITY;
-            Vector2 closestPoint = playerPos;
+            // Run game
+            NetworkController *controller = new NetworkController();
+            Game game = Game(controller, false);
+            Ship *player = game.getPlayer();
+            std::vector<double> inputs;
 
-            for (auto asteroid : asteroids)
+            while (player->IsAlive())
             {
-                Vector2 asteroidPos = asteroid->GetPosition();
-                RayCollision col = GetRayCollisionSphere(r, Vector3{asteroidPos.x, asteroidPos.y, 0}, asteroid->GetRadius());
+                game.Run();
 
-                if (col.hit && col.distance < shortestDistance)
+                Vector2 playerPos = player->GetPosition();
+                Vector2 playerVel = player->GetVelocity();
+
+                // Update network inputs
+                inputs.push_back(player->GetRotation() / 100.0 - 0.5);
+                inputs.push_back(playerPos.x / 1000.0 - 0.5);
+                inputs.push_back(playerPos.y / 1000.0 - 0.5);
+                inputs.push_back(playerVel.x / 100.0 - 0.5);
+                inputs.push_back(playerVel.y / 100.0 - 0.5);
+
+                // Raycast for network inputs
+                float deltaAngle = 360.0f / rayCount;
+                std::list<Asteroid *> asteroids = game.getAsteroids();
+
+                for (int j = 0; j < rayCount; j++)
                 {
-                    shortestDistance = col.distance - asteroid->GetRadius();
-                    closestPoint = {col.point.x, col.point.y};
+                    Vector3 rayVector = {cos(deltaAngle * j * PI / 180.0f), sin(deltaAngle * j * PI / 180.0f), 0};
+                    Ray r = {{playerPos.x, playerPos.y, 0}, rayVector};
+                    float shortestDistance = 1000; // Arbitrary number in this case about screenwidth
+                    Vector2 closestPoint = playerPos;
+
+                    for (auto asteroid : asteroids)
+                    {
+                        Vector2 asteroidPos = asteroid->GetPosition();
+                        RayCollision col = GetRayCollisionSphere(r, Vector3{asteroidPos.x, asteroidPos.y, 0}, asteroid->GetRadius());
+
+                        if (col.hit && col.distance < shortestDistance)
+                        {
+                            shortestDistance = abs(col.distance);
+                            closestPoint = {col.point.x, col.point.y};
+                        }
+                    }
+
+                    inputs.push_back(shortestDistance / 1000.0 - 0.5);
                 }
+
+                // Make decision
+                std::vector<double> outputs = population.networks[i].activate(inputs);
+
+                // for (int j = 0; j < numInputs; j++)
+                // {
+                //     std::cout << inputs[j] << std::endl;
+                // }
+
+                // std::cout << std::endl;
+
+                // for (int j = 0; j < 4; j++)
+                // {
+                //     std::cout << outputs[j] << std::endl;
+                // }
+
+                inputs.clear();
+
+                // Interpret decision and act
+                controller->UpdateInputs((outputs[0] > 0), (outputs[1] > 0), (outputs[2] > 0), (outputs[3] > 0));
             }
 
-            DrawLine(playerPos.x, playerPos.y, closestPoint.x, closestPoint.y, RED);
+            // FITNESS FUNCTION
+            population.networks[i].fitness = game.getScore();
         }
-
-        ClearBackground(BLACK);
     }
 
-    EndDrawing();
     return 0;
 }

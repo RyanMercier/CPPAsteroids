@@ -15,6 +15,7 @@ class Game
     const int screenWidth = 1000;
     const int screenHeight = 1000;
     Color backgroundColor;
+    bool draw = true;
 
     // Asteroid Control
     int maxAsteroids = 20;
@@ -34,13 +35,24 @@ class Game
 public:
     Game()
     {
-        Initialize();
+        if (draw)
+        {
+            Initialize();
+        }
+        Vector2 startPosition = Vector2{screenWidth / 2.0f, screenHeight / 2.0f};
+        player = new Ship(startPosition);
         controller = new KeyBoardController(player);
     }
 
-    Game(Controller *_controller)
+    Game(Controller *_controller, bool _draw)
     {
-        Initialize();
+        // draw = _draw;
+        if (draw)
+        {
+            Initialize();
+        }
+        Vector2 startPosition = Vector2{screenWidth / 2.0f, screenHeight / 2.0f};
+        player = new Ship(startPosition);
         controller = _controller;
         controller->player = player;
     }
@@ -76,8 +88,6 @@ public:
         // SetTargetFPS(60);
 
         backgroundColor = Color{0, 0, 0, 0};
-        Vector2 startPosition = Vector2{screenWidth / 2.0f, screenHeight / 2.0f};
-        player = new Ship(startPosition);
     }
 
     int Run()
@@ -85,7 +95,16 @@ public:
         if (!WindowShouldClose())
         {
             Update();
-            Draw();
+            if (draw)
+            {
+                Draw();
+            }
+
+            else if (!player->IsAlive())
+            {
+                CloseWindow();
+                return score;
+            }
         }
 
         else

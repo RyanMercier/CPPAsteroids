@@ -27,6 +27,10 @@ public:
 
     void UpdateInputs(bool _forward, bool _left, bool _right, bool _shoot)
     {
+        forward = _forward;
+        left = _left;
+        right = _right;
+        shoot = _shoot;
     }
 
     virtual void Update(float _deltaTime)
