@@ -115,6 +115,11 @@ public:
         return score;
     }
 
+    void Close()
+    {
+        CloseWindow();
+    }
+
     void HandleAsteroids(float _deltaTime);
 
     void Update();

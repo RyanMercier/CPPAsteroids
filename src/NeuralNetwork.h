@@ -24,6 +24,11 @@ public:
     NeuralNetwork(int _inputs, int _hidden, int _outputs, float _mutationRate, float _crossoverRate)
         : numInputs(_inputs), numHidden(_hidden), numOutputs(_outputs), mutationRate(_mutationRate), crossoverRate(_crossoverRate) {}
 
+    bool operator<(const NeuralNetwork &otherNet) const
+    {
+        return (fitness < otherNet.fitness);
+    }
+
     // Initialize the neural network structure
     void initialize()
     {

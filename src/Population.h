@@ -2,6 +2,7 @@
 #define POPULATION_H
 
 #include <vector>
+#include <algorithm>
 #include "NeuralNetwork.h"
 
 class Population
@@ -35,9 +36,10 @@ public:
     {
         // Select parents for reproduction
         // Sort by fitness and keep the best half
+        std::sort(networks.begin(), networks.end());
         std::vector<NeuralNetwork> parents;
         std::vector<NeuralNetwork> newGeneration;
-        for (int i = 0; i < size / 2; i++)
+        for (int i = size / 2; i < size; i++)
         {
             parents.push_back(networks[i]);
             parents.push_back(networks[i]);
@@ -47,7 +49,7 @@ public:
 
         // Create new generation through crossover and mutation
         // Generate second half by mutating and crossing over the first half
-        for (int i = 0; i < parents.size(); i++)
+        for (int i = 0; i < size / 2; i++)
         {
 
             NeuralNetwork parent1 = parents[GetRandomInt(0, size / 2)];

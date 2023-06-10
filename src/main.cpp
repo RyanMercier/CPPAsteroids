@@ -13,8 +13,8 @@ int numHidden = rayCount + 5;
 int numOutputs = 4;
 double mutationRate = 0.01;
 double crossoverRate = 0.7;
-int populationSize = 50;
-int numGenerations = 100;
+int populationSize = 10;
+int numGenerations = 10;
 
 int main()
 {
@@ -98,6 +98,10 @@ int main()
 
             // FITNESS FUNCTION
             population.networks[i].fitness = game.getScore();
+            game.Close();
+
+            // GENETIC ALGORITHM
+            population.Reproduce();
         }
     }
 
