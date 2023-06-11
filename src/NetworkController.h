@@ -2,6 +2,7 @@
 #define NETWORKCONTROLLER_H
 
 #include "Controller.h"
+#include <iostream>
 
 class NetworkController : public Controller
 {
@@ -18,6 +19,7 @@ public:
     NetworkController(Ship *_player)
     {
         player = _player;
+        std::cout << "controller alive" << std::endl;
     }
 
     NetworkController(Controller &copy)
@@ -36,25 +38,29 @@ public:
     virtual void Update(float _deltaTime)
     {
         // Handle Inputs
-
+        std::cout << "8" << std::endl;
         if (forward)
         {
             player->Accelerate(_deltaTime);
+            std::cout << "9" << std::endl;
         }
 
         if (left)
         {
             player->TurnLeft(_deltaTime);
+            std::cout << "10" << std::endl;
         }
 
         if (right)
         {
             player->TurnRight(_deltaTime);
+            std::cout << "11" << std::endl;
         }
 
         if (shoot)
         {
             player->Shoot();
+            std::cout << "12" << std::endl;
         }
     }
 };

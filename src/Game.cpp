@@ -1,4 +1,5 @@
 #include "Game.h"
+#include <iostream>
 
 void Game::HandleAsteroids(float _deltaTime)
 {
@@ -100,11 +101,15 @@ void Game::Update()
 
     if (player->IsAlive())
     {
+        std::cout << "4" << std::endl;
         controller->Update(deltaTime);
+        std::cout << "5" << std::endl;
         player->Update(deltaTime);
     }
 
+    std::cout << "6" << std::endl;
     HandleAsteroids(deltaTime);
+    std::cout << "7" << std::endl;
 }
 
 void Game::Draw()

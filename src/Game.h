@@ -1,12 +1,13 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include <list>
+#include <vector>
 #include <chrono>
 #include <raylib.h>
 #include "Ship.h"
 #include "Asteroid.h"
 #include "KeyBoardController.h"
+#include "NetworkController.h"
 
 class Game
 {
@@ -28,7 +29,7 @@ class Game
 
     Controller *controller;
     Ship *player;
-    std::list<Asteroid *> asteroids;
+    std::vector<Asteroid *> asteroids;
 
     int score = 0;
 
@@ -59,6 +60,12 @@ public:
 
     ~Game()
     {
+        free(controller);
+        free(player);
+        for (int i = 0; i < asteroids.size(); i++)
+        {
+            free(asteroids[i]);
+        }
     }
 
     Controller *getController()
@@ -71,7 +78,7 @@ public:
         return player;
     }
 
-    std::list<Asteroid *> getAsteroids()
+    std::vector<Asteroid *> getAsteroids()
     {
         return asteroids;
     }

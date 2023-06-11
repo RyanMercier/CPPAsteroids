@@ -2,6 +2,7 @@
 #define NEURALNETWORK_H
 
 #include <vector>
+#include <string>
 #include <random>
 #include "Neuron.h"
 
@@ -24,13 +25,42 @@ public:
     NeuralNetwork(int _inputs, int _hidden, int _outputs, float _mutationRate, float _crossoverRate)
         : numInputs(_inputs), numHidden(_hidden), numOutputs(_outputs), mutationRate(_mutationRate), crossoverRate(_crossoverRate) {}
 
+    NeuralNetwork(int _inputs, int _hidden, int _outputs, float _mutationRate, float _crossoverRate, std::vector<Neuron> _hiddenLayer, std::vector<Neuron> _outputLayer)
+        : numInputs(_inputs), numHidden(_hidden), numOutputs(_outputs), mutationRate(_mutationRate), crossoverRate(_crossoverRate), hiddenLayer(_hiddenLayer), outputLayer(_outputLayer) {}
+
     bool operator<(const NeuralNetwork &otherNet) const
     {
         return (fitness < otherNet.fitness);
     }
 
+    std::string ToString()
+    {
+        std::string data = {
+            "Fitness: " + std::to_string(fitness) + "\n" +
+            std::to_string(numInputs) + "\n" +
+            std::to_string(numHidden) + "\n" +
+            std::to_string(numOutputs) + "\n" +
+            std::to_string(mutationRate) + "\n" +
+            std::to_string(crossoverRate) + "\n"};
+
+        for (int i = 0; i < numHidden; i++)
+        {
+            data += "(" + hiddenLayer[i].ToString() + ")";
+        }
+
+        data += "\n";
+
+        for (int i = 0; i < numOutputs; i++)
+        {
+            data += "(" + outputLayer[i].ToString() + ")";
+        }
+
+        return data;
+    }
+
     // Initialize the neural network structure
-    void initialize()
+    void
+    initialize()
     {
         // Initialize hidden layer
         for (int i = 0; i < numHidden; i++)

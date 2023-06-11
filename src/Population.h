@@ -42,9 +42,12 @@ public:
         for (int i = size / 2; i < size; i++)
         {
             parents.push_back(networks[i]);
-            parents.push_back(networks[i]);
             newGeneration.push_back(networks[i]);
-            newGeneration.push_back(networks[i]);
+        }
+
+        for (int i = 0; i < size; i++)
+        {
+            std::cout << networks[i].fitness << std::endl;
         }
 
         // Create new generation through crossover and mutation
@@ -69,6 +72,12 @@ public:
 
         // Replace old population with new generation
         networks = newGeneration;
+    }
+
+    NeuralNetwork GetBestNet()
+    {
+        std::sort(networks.begin(), networks.end());
+        return networks.back();
     }
 };
 

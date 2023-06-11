@@ -1,10 +1,14 @@
 #include <vector>
+#include <string>
 #include <random>
 #include <iostream>
+#include <fstream>
+#include <sstream>
 #include "raylib.h"
 #include "Game.h"
 #include "NetworkController.h"
 #include "NeuralNetwork.h"
+#include "Simulation.h"
 #include "Population.h"
 
 int rayCount = 12;
@@ -13,95 +17,155 @@ int numHidden = rayCount + 5;
 int numOutputs = 4;
 double mutationRate = 0.01;
 double crossoverRate = 0.7;
-int populationSize = 10;
-int numGenerations = 10;
+int populationSize = 1;
+int numGenerations = 5;
 
-int main()
+std::string savePath = "./save.txt";
+
+Neuron ParseNeuron(const std::string &neuronData)
 {
-    // Create initial population
-    Population population = Population(populationSize, numInputs, numHidden, numOutputs, mutationRate, crossoverRate);
+    std::string data = neuronData;
+    data.erase(std::remove(data.begin(), data.end(), '('), data.end());
+    data.erase(std::remove(data.begin(), data.end(), ')'), data.end());
 
-    /////////// ADD SORTING AND A FITNESS FUNCTION!!!
+    std::istringstream iss(data);
+    std::string weight;
+    std::getline(iss, weight, ',');
+    double inputBias = std::stod(weight);
 
-    // Evolutionary loop
-    for (int generation = 0; generation < numGenerations; generation++)
+    std::vector<double> inputWeights;
+    while (std::getline(iss, weight, ','))
     {
-        // Evaluate fitness for each individual in the population
-        for (int i = 0; i < populationSize; i++)
+        inputWeights.push_back(std::stod(weight));
+    }
+
+    return Neuron(inputWeights, inputBias);
+}
+
+NeuralNetwork LoadFromFile(const std::string &filePath)
+{
+    std::ifstream file(filePath);
+
+    std::string line;
+    std::getline(file, line); // Read fitness
+    double sFitness = std::stod(line.substr(9));
+
+    std::getline(file, line); // Read numInputs
+    int sNumInputs = std::stoi(line);
+
+    std::getline(file, line); // Read numHidden
+    int sNumHidden = std::stoi(line);
+
+    std::getline(file, line); // Read numOutputs
+    int sNumOutputs = std::stoi(line);
+
+    std::getline(file, line); // Read mutationRate
+    double sMutationRate = std::stod(line);
+
+    std::getline(file, line); // Read crossoverRate
+    double sCrossoverRate = std::stod(line);
+
+    std::cout << "here" << std::endl;
+
+    std::vector<Neuron> hiddenLayer;
+    std::getline(file, line);                                   // Read hiddenLayer line
+    std::string neuronData = line.substr(1, line.length() - 2); // Remove parentheses
+
+    std::istringstream hiddenLayerIss(neuronData);
+    while (std::getline(hiddenLayerIss, neuronData, ')'))
+    {
+        hiddenLayer.push_back(ParseNeuron(neuronData));
+    }
+
+    std::vector<Neuron> outputLayer;
+    std::getline(file, line);                       // Read outputLayer line
+    neuronData = line.substr(1, line.length() - 2); // Remove parentheses
+
+    std::istringstream outputLayerIss(neuronData);
+    while (std::getline(outputLayerIss, neuronData, ')'))
+    {
+        outputLayer.push_back(ParseNeuron(neuronData));
+    }
+
+    for (int i = 0; i < hiddenLayer.size(); i++)
+    {
+        std::cout << hiddenLayer[i].ToString() << std::endl;
+    }
+
+    file.close();
+
+    return NeuralNetwork(sNumInputs, sNumHidden, sNumOutputs, sMutationRate, sCrossoverRate, hiddenLayer, outputLayer);
+}
+
+int main(int argc, char *argv[])
+{
+    if (argc == 1)
+    {
+        // Create initial population
+        Population population = Population(populationSize, numInputs, numHidden, numOutputs, mutationRate, crossoverRate);
+
+        // Evolutionary loop
+        for (int generation = 0; generation < numGenerations; generation++)
         {
-            // Run game
-            NetworkController *controller = new NetworkController();
-            Game game = Game(controller, false);
-            Ship *player = game.getPlayer();
-            std::vector<double> inputs;
+            std::vector<Simulation> sims;
 
-            while (player->IsAlive())
+            // Create simulations
+            for (int i = 0; i < populationSize; i++)
             {
-                game.Run();
-
-                Vector2 playerPos = player->GetPosition();
-                Vector2 playerVel = player->GetVelocity();
-
-                // Update network inputs
-                inputs.push_back(player->GetRotation() / 100.0 - 0.5);
-                inputs.push_back(playerPos.x / 1000.0 - 0.5);
-                inputs.push_back(playerPos.y / 1000.0 - 0.5);
-                inputs.push_back(playerVel.x / 100.0 - 0.5);
-                inputs.push_back(playerVel.y / 100.0 - 0.5);
-
-                // Raycast for network inputs
-                float deltaAngle = 360.0f / rayCount;
-                std::list<Asteroid *> asteroids = game.getAsteroids();
-
-                for (int j = 0; j < rayCount; j++)
-                {
-                    Vector3 rayVector = {cos(deltaAngle * j * PI / 180.0f), sin(deltaAngle * j * PI / 180.0f), 0};
-                    Ray r = {{playerPos.x, playerPos.y, 0}, rayVector};
-                    float shortestDistance = 1000; // Arbitrary number in this case about screenwidth
-                    Vector2 closestPoint = playerPos;
-
-                    for (auto asteroid : asteroids)
-                    {
-                        Vector2 asteroidPos = asteroid->GetPosition();
-                        RayCollision col = GetRayCollisionSphere(r, Vector3{asteroidPos.x, asteroidPos.y, 0}, asteroid->GetRadius());
-
-                        if (col.hit && col.distance < shortestDistance)
-                        {
-                            shortestDistance = abs(col.distance);
-                            closestPoint = {col.point.x, col.point.y};
-                        }
-                    }
-
-                    inputs.push_back(shortestDistance / 1000.0 - 0.5);
-                }
-
-                // Make decision
-                std::vector<double> outputs = population.networks[i].activate(inputs);
-
-                // for (int j = 0; j < numInputs; j++)
-                // {
-                //     std::cout << inputs[j] << std::endl;
-                // }
-
-                // std::cout << std::endl;
-
-                // for (int j = 0; j < 4; j++)
-                // {
-                //     std::cout << outputs[j] << std::endl;
-                // }
-
-                inputs.clear();
-
-                // Interpret decision and act
-                controller->UpdateInputs((outputs[0] > 0), (outputs[1] > 0), (outputs[2] > 0), (outputs[3] > 0));
+                sims.push_back(Simulation(&population.networks[i], rayCount));
             }
 
-            // FITNESS FUNCTION
-            population.networks[i].fitness = game.getScore();
-            game.Close();
+            // Run sim and Evaluate fitness for each individual in the population
+            bool alive = true;
+            while (alive)
+            {
+                alive = false;
+                for (int j = 0; j < sims.size(); j++)
+                {
+                    std::cout << "herez" << std::endl;
+                    if (sims[j].isAlive())
+                    {
+                        sims[j].Update();
+                        std::cout << "here" << std::endl;
+                        alive = true; // Set alive to true if any simulation is still alive
+                    }
+                }
+            }
 
             // GENETIC ALGORITHM
             population.Reproduce();
+        }
+
+        // Save best network
+        NeuralNetwork bestNet = population.GetBestNet();
+        std::ofstream saveFile(savePath);
+        if (saveFile.is_open())
+        {
+            saveFile << bestNet.ToString() << std::endl;
+            saveFile.close();
+        }
+        else
+        {
+            std::cout << "Unable to open file";
+        }
+    }
+
+    // Load Network
+    else
+    {
+        std::ifstream file(argv[1]);
+        if (!file)
+        {
+            // Handle file open error
+            return 0;
+        }
+
+        NeuralNetwork net = LoadFromFile(argv[1]);
+        Simulation sim = Simulation(&net, rayCount);
+
+        while (sim.isAlive())
+        {
+            sim.Update();
         }
     }
 

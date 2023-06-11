@@ -2,6 +2,7 @@
 #define NEURON_H
 
 #include <vector>
+#include <string>
 #include <cmath>
 
 class Neuron
@@ -29,6 +30,18 @@ public:
             sum += inputs[i] * inputWeights[i];
         }
         output = activationFunction(sum + inputBias);
+    }
+
+    std::string ToString()
+    {
+        std::string data = std::to_string(inputBias);
+
+        for (int i = 0; i < inputWeights.size(); i++)
+        {
+            data += "," + std::to_string(inputWeights[i]);
+        }
+
+        return data;
     }
 };
 
