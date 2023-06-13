@@ -49,10 +49,10 @@ public:
 
     ~Ship()
     {
-        // for (auto bullet : bullets)
-        // {
-        //     delete bullet;
-        // }
+        for (auto bullet : bullets)
+        {
+            delete bullet;
+        }
     }
 
     bool IsAlive()

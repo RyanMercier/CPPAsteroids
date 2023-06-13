@@ -74,6 +74,7 @@ void Ship::HandleProjectiles(float _deltaTime)
     {
         if (!(*it)->IsAlive())
         {
+            delete *it;
             it = bullets.erase(it);
         }
         else

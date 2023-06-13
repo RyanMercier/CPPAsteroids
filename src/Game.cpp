@@ -1,15 +1,8 @@
 #include "Game.h"
 #include <iostream>
 
-void Game::HandleAsteroids(float _deltaTime)
+void Game::SpawnAsteroids()
 {
-    // Difficulty Control
-    if (score >= lastDifficultyScore + 20)
-    {
-        lastDifficultyScore = score;
-        maxAsteroids++;
-    }
-
     // Spawn Asteroids
     if (asteroids.size() < maxAsteroids)
     {
@@ -29,7 +22,11 @@ void Game::HandleAsteroids(float _deltaTime)
             lastAsteroidTime = currentTime;
         }
     }
+}
 
+void Game::HandleCollisions(float _deltaTime)
+{
+    std::vector<Asteroid *> asteroidsToAdd;
     std::vector<Asteroid *> asteroidsToRemove;
 
     for (auto it = asteroids.begin(); it != asteroids.end(); ++it)
@@ -59,7 +56,7 @@ void Game::HandleAsteroids(float _deltaTime)
                         int splitCount = GetRandomValue(2, 3);
                         for (int j = 0; j < splitCount; j++)
                         {
-                            asteroids.push_back(new Asteroid(asteroid->GetPosition(), asteroid->GetDirection() + GetRandomValue(-45, 45), asteroid->GetSpeed(), (asteroid->GetRadius() / splitCount) + GetRandomValue(0, 10)));
+                            asteroidsToAdd.push_back(new Asteroid(asteroid->GetPosition(), asteroid->GetDirection() + GetRandomValue(-45, 45), asteroid->GetSpeed(), (asteroid->GetRadius() / splitCount) + GetRandomValue(0, 10)));
                         }
                     }
 
@@ -68,13 +65,15 @@ void Game::HandleAsteroids(float _deltaTime)
                         score++;
                     }
 
-                    delete p;
-                    bullet = bullets.erase(bullet);
+                    // delete p;
+                    // bullet = bullets.erase(bullet);
                 }
-                else
-                {
-                    ++bullet;
-                }
+                // else
+                // {
+                //     ++bullet;
+                // }
+
+                bullet++;
             }
 
             if (Vector2Distance(asteroid->GetPosition(), player->GetPosition()) <= asteroidRadius + 2 && player->IsAlive())
@@ -87,7 +86,7 @@ void Game::HandleAsteroids(float _deltaTime)
                     int splitCount = GetRandomValue(5, 15);
                     for (int j = 0; j < splitCount; j++)
                     {
-                        asteroids.push_back(new Asteroid(asteroid->GetPosition(), GetRandomValue(0, 360), asteroid->GetSpeed() + Vector2Length(player->GetVelocity()), (asteroidRadius / splitCount) + GetRandomValue(5, 15)));
+                        asteroidsToAdd.push_back(new Asteroid(asteroid->GetPosition(), GetRandomValue(0, 360), asteroid->GetSpeed() + Vector2Length(player->GetVelocity()), (asteroidRadius / splitCount) + GetRandomValue(5, 15)));
                     }
                 }
             }
@@ -102,6 +101,27 @@ void Game::HandleAsteroids(float _deltaTime)
         asteroids.erase(std::remove(asteroids.begin(), asteroids.end(), asteroidToRemove), asteroids.end());
         delete asteroidToRemove;
     }
+    asteroidsToRemove.clear();
+
+    // Add new asteroids
+    for (Asteroid *asteroidToAdd : asteroidsToAdd)
+    {
+        asteroids.push_back(asteroidToAdd);
+    }
+    asteroidsToAdd.clear();
+}
+
+void Game::HandleAsteroids(float _deltaTime)
+{
+    // Difficulty Control
+    if (score >= lastDifficultyScore + 20)
+    {
+        lastDifficultyScore = score;
+        maxAsteroids++;
+    }
+
+    SpawnAsteroids();
+    HandleCollisions(_deltaTime); // and update asteroids
 }
 
 void Game::Update()

@@ -17,8 +17,8 @@ int numHidden = rayCount + 5;
 int numOutputs = 4;
 double mutationRate = 0.01;
 double crossoverRate = 0.7;
-int populationSize = 1;
-int numGenerations = 5;
+int populationSize = 10;
+int numGenerations = 10;
 
 std::string savePath = "./save.txt";
 

@@ -25,7 +25,6 @@ public:
 
     ~Simulation()
     {
-        std::cout << "Simulation Destructor" << std::endl;
     }
 
     void Update();

@@ -69,7 +69,6 @@ public:
 
     ~Game()
     {
-        std::cout << "Game Destructor" << std::endl;
         for (int i = 0; i < asteroids.size(); i++)
         {
             delete asteroids[i];
@@ -147,6 +146,10 @@ public:
     {
         CloseWindow();
     }
+
+    void SpawnAsteroids();
+
+    void HandleCollisions(float _deltaTime);
 
     void HandleAsteroids(float _deltaTime);
 

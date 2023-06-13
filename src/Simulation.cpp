@@ -38,38 +38,33 @@ void Simulation::Update()
 
 std::vector<double> Simulation::GetAsteroidInputs(Vector2 playerPos)
 {
-    // std::vector<double> result;
-
-    // // Raycast for network inputs
-    // float deltaAngle = 360.0f / rayCount;
-    // std::vector<Asteroid *> asteroids = game->GetAsteroids();
-
-    // for (int j = 0; j < rayCount; j++)
-    // {
-    //     Vector3 rayVector = {cos(deltaAngle * j * PI / 180.0f), sin(deltaAngle * j * PI / 180.0f), 0};
-    //     Ray r = {{playerPos.x, playerPos.y, 0}, rayVector};
-    //     float shortestDistance = 1000; // Arbitrary number in this case about screenwidth
-    //     Vector2 closestPoint = playerPos;
-
-    //     for (auto asteroid : asteroids)
-    //     {
-    //         Vector2 asteroidPos = asteroid->GetPosition();
-    //         RayCollision col = GetRayCollisionSphere(r, Vector3{asteroidPos.x, asteroidPos.y, 0}, asteroid->GetRadius());
-
-    //         if (col.hit && col.distance < shortestDistance)
-    //         {
-    //             shortestDistance = abs(col.distance);
-    //             closestPoint = {col.point.x, col.point.y};
-    //         }
-    //     }
-
-    //     result.push_back(shortestDistance / 1000.0 - 0.5);
-    // }
-
-    // return result;
-
     std::vector<double> result;
-    result.push_back(0);
+
+    // Raycast for network inputs
+    float deltaAngle = 360.0f / rayCount;
+    std::vector<Asteroid *> asteroids = game->GetAsteroids();
+
+    for (int j = 0; j < rayCount; j++)
+    {
+        Vector3 rayVector = {cos(deltaAngle * j * PI / 180.0f), sin(deltaAngle * j * PI / 180.0f), 0};
+        Ray r = {{playerPos.x, playerPos.y, 0}, rayVector};
+        float shortestDistance = 1000; // Arbitrary number in this case about screenwidth
+        Vector2 closestPoint = playerPos;
+
+        for (auto asteroid : asteroids)
+        {
+            Vector2 asteroidPos = asteroid->GetPosition();
+            RayCollision col = GetRayCollisionSphere(r, Vector3{asteroidPos.x, asteroidPos.y, 0}, asteroid->GetRadius());
+
+            if (col.hit && col.distance < shortestDistance)
+            {
+                shortestDistance = abs(col.distance);
+                closestPoint = {col.point.x, col.point.y};
+            }
+        }
+
+        result.push_back(shortestDistance / 1000.0 - 0.5);
+    }
 
     return result;
 }
