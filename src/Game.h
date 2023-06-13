@@ -3,6 +3,8 @@
 
 #include <vector>
 #include <chrono>
+#include <memory>
+#include <algorithm>
 #include <raylib.h>
 #include "Ship.h"
 #include "Asteroid.h"
@@ -27,8 +29,8 @@ class Game
     double asteroidUpdateTime = 0.1; // how many seconds between checking if another asteroid is neccessary
     std::chrono::system_clock::time_point lastAsteroidTime = std::chrono::system_clock::now();
 
-    Controller *controller;
-    Ship *player;
+    std::unique_ptr<Controller> controller;
+    std::unique_ptr<Ship> player;
     std::vector<Asteroid *> asteroids;
 
     int score = 0;
@@ -41,44 +43,70 @@ public:
             Initialize();
         }
         Vector2 startPosition = Vector2{screenWidth / 2.0f, screenHeight / 2.0f};
-        player = new Ship(startPosition);
-        controller = new KeyBoardController(player);
+        player = std::make_unique<Ship>(startPosition);
+        controller = std::make_unique<KeyBoardController>(player.get());
     }
 
-    Game(Controller *_controller, bool _draw)
+    Game(bool network, bool _draw)
     {
-        // draw = _draw;
+        draw = _draw;
         if (draw)
         {
             Initialize();
         }
         Vector2 startPosition = Vector2{screenWidth / 2.0f, screenHeight / 2.0f};
-        player = new Ship(startPosition);
-        controller = _controller;
-        controller->player = player;
+        player = std::make_unique<Ship>(startPosition);
+
+        if (network)
+        {
+            controller = std::make_unique<NetworkController>(player.get());
+        }
+        else
+        {
+            controller = std::make_unique<KeyBoardController>(player.get());
+        }
     }
 
     ~Game()
     {
-        free(controller);
-        free(player);
+        std::cout << "Game Destructor" << std::endl;
         for (int i = 0; i < asteroids.size(); i++)
         {
-            free(asteroids[i]);
+            delete asteroids[i];
         }
     }
 
-    Controller *getController()
+    bool IsAlive()
+    {
+        return player->IsAlive();
+    }
+
+    Vector2 GetPlayerPosition()
+    {
+        return player->GetPosition();
+    }
+
+    Vector2 GetPlayerVelocity()
+    {
+        return player->GetVelocity();
+    }
+
+    float GetPlayerRotation()
+    {
+        return player->GetRotation();
+    }
+
+    std::unique_ptr<Controller> &GetController()
     {
         return controller;
     }
 
-    Ship *getPlayer()
+    std::unique_ptr<Ship> &GetPlayer()
     {
         return player;
     }
 
-    std::vector<Asteroid *> getAsteroids()
+    std::vector<Asteroid *> GetAsteroids()
     {
         return asteroids;
     }
@@ -99,24 +127,17 @@ public:
 
     int Run()
     {
-        if (!WindowShouldClose())
+        if (!WindowShouldClose() && player->IsAlive())
         {
             Update();
             if (draw)
             {
                 Draw();
             }
-
-            else if (!player->IsAlive())
-            {
-                CloseWindow();
-                return score;
-            }
         }
-
         else
         {
-            CloseWindow();
+            Close();
         }
 
         return score;

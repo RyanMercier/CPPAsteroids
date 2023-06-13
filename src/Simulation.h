@@ -1,6 +1,7 @@
 #ifndef SIMULATION_H
-#define SIMULATIOM_H
+#define SIMULATION_H
 
+#include <memory>
 #include "raylib.h"
 #include "Game.h"
 #include "NetworkController.h"
@@ -8,37 +9,33 @@
 
 class Simulation
 {
-    NeuralNetwork *network;
-    NetworkController *controller;
-    Game *game;
-    Ship *player;
+    std::unique_ptr<NeuralNetwork> network;
+    std::unique_ptr<Game> game;
+    std::unique_ptr<Controller> controller;
     int rayCount = 0;
     std::vector<double> inputs;
 
 public:
-    Simulation(NeuralNetwork *_network, int _rayCount)
+    Simulation(std::unique_ptr<NeuralNetwork> _network, int _rayCount)
+        : network(std::move(_network)), rayCount(_rayCount)
     {
-        network = _network;
-        controller = new NetworkController();
-        game = new Game(controller, false);
-        rayCount = _rayCount;
-        player = game->getPlayer();
+        game = std::make_unique<Game>(true, true);
+        inputs = std::vector<double>();
     }
 
     ~Simulation()
     {
-        free(controller);
-        free(game);
+        std::cout << "Simulation Destructor" << std::endl;
     }
 
     void Update();
 
     bool isAlive()
     {
-        return player->IsAlive();
+        return game->IsAlive();
     }
 
-    std::vector<double> GetAsteroidInputs(Game *game, Vector2 playerPos);
+    std::vector<double> GetAsteroidInputs(Vector2 playerPos);
 };
 
 #endif

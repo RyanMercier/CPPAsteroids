@@ -19,7 +19,6 @@ public:
     NetworkController(Ship *_player)
     {
         player = _player;
-        std::cout << "controller alive" << std::endl;
     }
 
     NetworkController(Controller &copy)
@@ -27,7 +26,7 @@ public:
         player = copy.player;
     }
 
-    void UpdateInputs(bool _forward, bool _left, bool _right, bool _shoot)
+    virtual void UpdateInputs(bool _forward, bool _left, bool _right, bool _shoot)
     {
         forward = _forward;
         left = _left;
@@ -38,29 +37,27 @@ public:
     virtual void Update(float _deltaTime)
     {
         // Handle Inputs
-        std::cout << "8" << std::endl;
-        if (forward)
+        if (player)
         {
-            player->Accelerate(_deltaTime);
-            std::cout << "9" << std::endl;
-        }
+            if (forward)
+            {
+                player->Accelerate(_deltaTime);
+            }
 
-        if (left)
-        {
-            player->TurnLeft(_deltaTime);
-            std::cout << "10" << std::endl;
-        }
+            if (left)
+            {
+                player->TurnLeft(_deltaTime);
+            }
 
-        if (right)
-        {
-            player->TurnRight(_deltaTime);
-            std::cout << "11" << std::endl;
-        }
+            if (right)
+            {
+                player->TurnRight(_deltaTime);
+            }
 
-        if (shoot)
-        {
-            player->Shoot();
-            std::cout << "12" << std::endl;
+            if (shoot)
+            {
+                player->Shoot();
+            }
         }
     }
 };

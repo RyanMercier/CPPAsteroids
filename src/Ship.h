@@ -2,7 +2,6 @@
 #define SHIP_H
 
 #include <vector>
-#include <list>
 #include <chrono>
 #include "raylib.h"
 #include "raymath.h"
@@ -25,7 +24,7 @@ class Ship
     // bullet control
     float shotsPerSecond = 10;
     std::chrono::system_clock::time_point lastShotTime = std::chrono::system_clock::now();
-    std::list<Projectile *> bullets;
+    std::vector<Projectile *> bullets;
 
 public:
     Ship()
@@ -40,14 +39,21 @@ public:
         velocity = Vector2{0, 0};
     }
 
-    Ship(Ship &copy)
+    Ship(const Ship &copy)
     {
+        alive = copy.alive;
         position = copy.position;
         velocity = copy.velocity;
         rotation = copy.rotation;
     }
 
-    ~Ship() {}
+    ~Ship()
+    {
+        // for (auto bullet : bullets)
+        // {
+        //     delete bullet;
+        // }
+    }
 
     bool IsAlive()
     {
@@ -59,7 +65,7 @@ public:
         alive = _alive;
     }
 
-    Vector2 GetPosition()
+    Vector2 GetPosition() const
     {
         return position;
     }
@@ -69,7 +75,7 @@ public:
         position = _position;
     }
 
-    Vector2 GetVelocity()
+    Vector2 GetVelocity() const
     {
         return velocity;
     }
@@ -79,7 +85,7 @@ public:
         velocity = _velocity;
     }
 
-    float GetRotation()
+    float GetRotation() const
     {
         return rotation;
     }
@@ -97,12 +103,12 @@ public:
         }
     }
 
-    std::list<Projectile *> GetBullets()
+    std::vector<Projectile *> GetBullets()
     {
         return bullets;
     }
 
-    std::vector<Vector2> GetVertices();
+    std::vector<Vector2> GetVertices() const;
 
     void Accelerate(float _deltaTime);
 

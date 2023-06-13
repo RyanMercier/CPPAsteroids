@@ -70,19 +70,17 @@ void Ship::Shoot()
 
 void Ship::HandleProjectiles(float _deltaTime)
 {
-    std::list<Projectile *>::iterator i = bullets.begin();
-    while (i != bullets.end())
+    for (auto it = bullets.begin(); it != bullets.end();)
     {
-        if (!(*i)->IsAlive())
+        if (!(*it)->IsAlive())
         {
-            delete *i;
-            bullets.erase(i++);
+            it = bullets.erase(it);
         }
         else
         {
-            (*i)->Update(_deltaTime);
-            (*i)->Draw();
-            i++;
+            (*it)->Update(_deltaTime);
+            (*it)->Draw();
+            ++it;
         }
     }
 }
@@ -114,7 +112,7 @@ void Ship::HandleScreenWrap()
     }
 }
 
-std::vector<Vector2> Ship::GetVertices()
+std::vector<Vector2> Ship::GetVertices() const
 {
     // rotate triangle
     Vector2 v1 = Vector2Rotate(vertices[0], rotation * PI / 180);

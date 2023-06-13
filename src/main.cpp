@@ -65,8 +65,6 @@ NeuralNetwork LoadFromFile(const std::string &filePath)
     std::getline(file, line); // Read crossoverRate
     double sCrossoverRate = std::stod(line);
 
-    std::cout << "here" << std::endl;
-
     std::vector<Neuron> hiddenLayer;
     std::getline(file, line);                                   // Read hiddenLayer line
     std::string neuronData = line.substr(1, line.length() - 2); // Remove parentheses
@@ -99,20 +97,22 @@ NeuralNetwork LoadFromFile(const std::string &filePath)
 
 int main(int argc, char *argv[])
 {
+    std::cout << "Begin Training ..." << std::endl;
     if (argc == 1)
     {
         // Create initial population
         Population population = Population(populationSize, numInputs, numHidden, numOutputs, mutationRate, crossoverRate);
+        std::vector<std::unique_ptr<Simulation>> sims;
 
         // Evolutionary loop
         for (int generation = 0; generation < numGenerations; generation++)
         {
-            std::vector<Simulation> sims;
+            std::cout << "Computing Generation: " << generation << " / " << numGenerations << std::endl;
 
             // Create simulations
             for (int i = 0; i < populationSize; i++)
             {
-                sims.push_back(Simulation(&population.networks[i], rayCount));
+                sims.push_back(std::make_unique<Simulation>(std::make_unique<NeuralNetwork>(population.networks[i]), rayCount));
             }
 
             // Run sim and Evaluate fitness for each individual in the population
@@ -122,15 +122,16 @@ int main(int argc, char *argv[])
                 alive = false;
                 for (int j = 0; j < sims.size(); j++)
                 {
-                    std::cout << "herez" << std::endl;
-                    if (sims[j].isAlive())
+                    if (sims[j]->isAlive())
                     {
-                        sims[j].Update();
-                        std::cout << "here" << std::endl;
+                        sims[j]->Update();
                         alive = true; // Set alive to true if any simulation is still alive
                     }
                 }
             }
+
+            // Clear previous simulations
+            sims.clear();
 
             // GENETIC ALGORITHM
             population.Reproduce();
@@ -161,11 +162,11 @@ int main(int argc, char *argv[])
         }
 
         NeuralNetwork net = LoadFromFile(argv[1]);
-        Simulation sim = Simulation(&net, rayCount);
+        std::unique_ptr<Simulation> sim = std::make_unique<Simulation>(std::make_unique<NeuralNetwork>(net), rayCount);
 
-        while (sim.isAlive())
+        while (sim->isAlive())
         {
-            sim.Update();
+            sim->Update();
         }
     }
 
