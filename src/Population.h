@@ -34,11 +34,6 @@ public:
 
     void Reproduce()
     {
-        for (int i = 0; i < size; i++)
-        {
-            std::cout << networks[i].fitness << std::endl;
-        }
-
         // Select parents for reproduction
         // Sort by fitness and keep the best half
         std::sort(networks.begin(), networks.end());

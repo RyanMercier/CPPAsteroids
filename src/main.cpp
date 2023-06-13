@@ -17,8 +17,10 @@ int numHidden = rayCount + 5;
 int numOutputs = 4;
 double mutationRate = 0.01;
 double crossoverRate = 0.7;
-int populationSize = 1;
-int numGenerations = 10;
+int populationSize = 100;
+int numGenerations = 100;
+
+bool drawBest = false;
 
 std::string savePath = "./save.txt";
 
@@ -97,22 +99,24 @@ NeuralNetwork LoadFromFile(const std::string &filePath)
 
 int main(int argc, char *argv[])
 {
-    std::cout << "Begin Training ..." << std::endl;
     if (argc == 1)
     {
+        std::cout << "Begin Training ..." << std::endl;
         // Create initial population
         Population population = Population(populationSize, numInputs, numHidden, numOutputs, mutationRate, crossoverRate);
-        std::vector<std::unique_ptr<Simulation>> sims;
 
         // Evolutionary loop
         for (int generation = 0; generation < numGenerations; generation++)
         {
-            std::cout << "Computing Generation: " << generation << " / " << numGenerations << std::endl;
+            std::cout << "Computing Generation: " << generation + 1 << " / " << numGenerations << std::endl;
+
+            std::vector<std::unique_ptr<Simulation>> sims;
+            sims.push_back(std::make_unique<Simulation>(std::make_unique<NeuralNetwork>(population.networks[0]), rayCount, drawBest));
 
             // Create simulations
-            for (int i = 0; i < populationSize; i++)
+            for (int i = 1; i < populationSize; i++)
             {
-                sims.push_back(std::make_unique<Simulation>(std::make_unique<NeuralNetwork>(population.networks[i]), rayCount));
+                sims.push_back(std::make_unique<Simulation>(std::make_unique<NeuralNetwork>(population.networks[i]), rayCount, false));
             }
 
             // Run sim and Evaluate fitness for each individual in the population
@@ -140,10 +144,7 @@ int main(int argc, char *argv[])
             NeuralNetwork bestNet = population.GetBestNet();
             std::cout << "Best Score of Generation: " << bestNet.fitness << std::endl;
 
-            // Clear previous simulations
-            sims.clear();
-
-            if (generation == numGenerations - 1)
+            if (generation <= numGenerations - 1)
             {
                 // GENETIC ALGORITHM
                 population.Reproduce();
@@ -169,6 +170,7 @@ int main(int argc, char *argv[])
     // Load Network
     else
     {
+        std::cout << "Loading Network ..." << std::endl;
         std::ifstream file(argv[1]);
         if (!file)
         {
@@ -177,7 +179,7 @@ int main(int argc, char *argv[])
         }
 
         NeuralNetwork net = LoadFromFile(argv[1]);
-        std::unique_ptr<Simulation> sim = std::make_unique<Simulation>(std::make_unique<NeuralNetwork>(net), rayCount);
+        std::unique_ptr<Simulation> sim = std::make_unique<Simulation>(std::make_unique<NeuralNetwork>(net), rayCount, true);
 
         while (sim->isAlive())
         {

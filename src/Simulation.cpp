@@ -1,5 +1,4 @@
 #include "Simulation.h"
-#include <iostream>
 
 void Simulation::Update()
 {

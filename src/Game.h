@@ -73,6 +73,8 @@ public:
         {
             delete asteroids[i];
         }
+
+        Close();
     }
 
     bool IsAlive()

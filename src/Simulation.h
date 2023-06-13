@@ -16,10 +16,10 @@ class Simulation
     std::vector<double> inputs;
 
 public:
-    Simulation(std::unique_ptr<NeuralNetwork> _network, int _rayCount)
+    Simulation(std::unique_ptr<NeuralNetwork> _network, int _rayCount, bool _draw)
         : network(std::move(_network)), rayCount(_rayCount)
     {
-        game = std::make_unique<Game>(true, true);
+        game = std::make_unique<Game>(true, _draw);
         inputs = std::vector<double>();
     }
 
@@ -31,11 +31,6 @@ public:
 
     bool isAlive()
     {
-        if (!game->IsAlive())
-        {
-            game->Close();
-        }
-
         return game->IsAlive();
     }
 
