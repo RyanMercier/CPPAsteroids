@@ -1,5 +1,4 @@
 #include "Game.h"
-#include <iostream>
 
 void Game::SpawnAsteroids()
 {
@@ -137,15 +136,18 @@ void Game::Update()
 
 void Game::Draw()
 {
-    BeginDrawing();
-    ClearBackground(backgroundColor);
-    player->Draw();
-    for (const auto &asteroid : asteroids)
+    if (draw)
     {
-        asteroid->Draw();
+        BeginDrawing();
+        ClearBackground(backgroundColor);
+        player->Draw();
+        for (const auto &asteroid : asteroids)
+        {
+            asteroid->Draw();
+        }
+
+        DrawText(TextFormat("SCORE: %i", score), 50, 50, 24, RAYWHITE);
+
+        EndDrawing();
     }
-
-    DrawText(TextFormat("SCORE: %i", score), 50, 50, 24, RAYWHITE);
-
-    EndDrawing();
 }

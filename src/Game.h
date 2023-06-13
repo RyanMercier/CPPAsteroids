@@ -110,7 +110,7 @@ public:
         return asteroids;
     }
 
-    int getScore()
+    int GetScore()
     {
         return score;
     }
@@ -126,17 +126,13 @@ public:
 
     int Run()
     {
-        if (!WindowShouldClose() && player->IsAlive())
+        if (player->IsAlive())
         {
             Update();
-            if (draw)
+            if (draw && !WindowShouldClose())
             {
                 Draw();
             }
-        }
-        else
-        {
-            Close();
         }
 
         return score;
@@ -144,7 +140,10 @@ public:
 
     void Close()
     {
-        CloseWindow();
+        if (draw)
+        {
+            CloseWindow();
+        }
     }
 
     void SpawnAsteroids();

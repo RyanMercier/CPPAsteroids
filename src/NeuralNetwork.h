@@ -33,6 +33,16 @@ public:
         return (fitness < otherNet.fitness);
     }
 
+    void SetFitness(float _fitness)
+    {
+        fitness = _fitness;
+    }
+
+    float GetFitness()
+    {
+        return fitness;
+    }
+
     std::string ToString()
     {
         std::string data = {

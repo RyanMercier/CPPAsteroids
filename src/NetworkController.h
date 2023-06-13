@@ -2,7 +2,6 @@
 #define NETWORKCONTROLLER_H
 
 #include "Controller.h"
-#include <iostream>
 
 class NetworkController : public Controller
 {

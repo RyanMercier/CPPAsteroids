@@ -17,7 +17,7 @@ int numHidden = rayCount + 5;
 int numOutputs = 4;
 double mutationRate = 0.01;
 double crossoverRate = 0.7;
-int populationSize = 10;
+int populationSize = 1;
 int numGenerations = 10;
 
 std::string savePath = "./save.txt";
@@ -139,6 +139,8 @@ int main(int argc, char *argv[])
 
         // Save best network
         NeuralNetwork bestNet = population.GetBestNet();
+        std::cout << "Best Score of Generation: " << bestNet.fitness << std::endl;
+
         std::ofstream saveFile(savePath);
         if (saveFile.is_open())
         {

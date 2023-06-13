@@ -80,7 +80,6 @@ void Ship::HandleProjectiles(float _deltaTime)
         else
         {
             (*it)->Update(_deltaTime);
-            (*it)->Draw();
             ++it;
         }
     }
@@ -140,5 +139,10 @@ void Ship::Draw()
     {
         std::vector<Vector2> verts = GetVertices();
         DrawTriangleLines(verts[0], verts[1], verts[2], RAYWHITE);
+
+        for (auto bullet : bullets)
+        {
+            bullet->Draw();
+        }
     }
 }

@@ -1,6 +1,5 @@
 #include "Simulation.h"
 #include <iostream>
-#include <memory>
 
 void Simulation::Update()
 {
@@ -27,12 +26,10 @@ void Simulation::Update()
 
         // Interpret decision and act
         game->GetController()->UpdateInputs((outputs[0] > 0), (outputs[1] > 0), (outputs[2] > 0), (outputs[3] > 0));
-    }
-    else
-    {
+
         // FITNESS FUNCTION
-        network->fitness = game->getScore();
-        game->Close();
+        std::cout << game->GetScore() << std::endl;
+        network->SetFitness(game->GetScore());
     }
 }
 

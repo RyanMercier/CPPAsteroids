@@ -31,6 +31,11 @@ public:
 
     bool isAlive()
     {
+        if (!game->IsAlive())
+        {
+            game->Close();
+        }
+
         return game->IsAlive();
     }
 
