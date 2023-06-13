@@ -26,10 +26,6 @@ void Simulation::Update()
 
         // Interpret decision and act
         game->GetController()->UpdateInputs((outputs[0] > 0), (outputs[1] > 0), (outputs[2] > 0), (outputs[3] > 0));
-
-        // FITNESS FUNCTION
-        std::cout << game->GetScore() << std::endl;
-        network->SetFitness(game->GetScore());
     }
 }
 

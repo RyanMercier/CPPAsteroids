@@ -39,6 +39,11 @@ public:
         return game->IsAlive();
     }
 
+    int GetScore()
+    {
+        return game->GetScore();
+    }
+
     std::vector<double> GetAsteroidInputs(Vector2 playerPos);
 };
 

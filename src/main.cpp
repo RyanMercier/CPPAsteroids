@@ -130,11 +130,24 @@ int main(int argc, char *argv[])
                 }
             }
 
+            // Update fitness values in the population
+            for (int i = 0; i < populationSize; i++)
+            {
+                population.networks[i].fitness = sims[i]->GetScore();
+            }
+
+            // Save best network
+            NeuralNetwork bestNet = population.GetBestNet();
+            std::cout << "Best Score of Generation: " << bestNet.fitness << std::endl;
+
             // Clear previous simulations
             sims.clear();
 
-            // GENETIC ALGORITHM
-            population.Reproduce();
+            if (generation == numGenerations - 1)
+            {
+                // GENETIC ALGORITHM
+                population.Reproduce();
+            }
         }
 
         // Save best network
