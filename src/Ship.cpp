@@ -63,6 +63,7 @@ void Ship::Shoot()
     {
         bullets.push_back(new Projectile(position, rotation));
         lastShotTime = currentTime;
+        shotsFired++;
     }
 }
 

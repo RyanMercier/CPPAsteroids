@@ -117,6 +117,11 @@ public:
         return score;
     }
 
+    float GetHitrate()
+    {
+        return player->GetShotsFired() + 1 / score;
+    }
+
     void Initialize()
     {
         SetConfigFlags(FLAG_VSYNC_HINT);

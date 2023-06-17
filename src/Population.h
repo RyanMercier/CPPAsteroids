@@ -37,21 +37,20 @@ public:
         // Select parents for reproduction
         // Sort by fitness and keep the best half
         std::sort(networks.begin(), networks.end());
-        std::vector<NeuralNetwork> parents;
         std::vector<NeuralNetwork> newGeneration;
-        for (int i = size / 2; i < size; i++)
+
+        // Move Elites to new generation
+        for (int i = size / 4 + 1; i < size; i++)
         {
-            parents.push_back(networks[i]);
             newGeneration.push_back(networks[i]);
         }
 
         // Create new generation through crossover and mutation
-        // Generate second half by mutating and crossing over the first half
-        for (int i = 0; i < size / 2; i++)
+        while (newGeneration.size() < size)
         {
 
-            NeuralNetwork parent1 = parents[GetRandomInt(0, size / 2)];
-            NeuralNetwork parent2 = parents[GetRandomInt(0, size / 2)];
+            NeuralNetwork parent1 = networks[GetRandomInt(0, size)];
+            NeuralNetwork parent2 = networks[GetRandomInt(0, size)];
 
             NeuralNetwork offspring1 = parent1;
             NeuralNetwork offspring2 = parent2;

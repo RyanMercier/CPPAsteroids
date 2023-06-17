@@ -26,6 +26,8 @@ class Ship
     std::chrono::system_clock::time_point lastShotTime = std::chrono::system_clock::now();
     std::vector<Projectile *> bullets;
 
+    int shotsFired = 0;
+
 public:
     Ship()
     {
@@ -101,6 +103,11 @@ public:
         {
             rotation += 360;
         }
+    }
+
+    int GetShotsFired()
+    {
+        return shotsFired;
     }
 
     std::vector<Projectile *> GetBullets()

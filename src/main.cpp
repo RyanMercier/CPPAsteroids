@@ -17,10 +17,10 @@ int numHidden = rayCount + 5;
 int numOutputs = 4;
 double mutationRate = 0.01;
 double crossoverRate = 0.7;
-int populationSize = 100;
-int numGenerations = 100;
+int populationSize = 500;
+int numGenerations = 500;
 
-bool drawBest = false;
+bool drawBest = true;
 
 std::string savePath = "./save.txt";
 
@@ -137,7 +137,9 @@ int main(int argc, char *argv[])
             // Update fitness values in the population
             for (int i = 0; i < populationSize; i++)
             {
-                population.networks[i].fitness = sims[i]->GetScore();
+                population.networks[i].fitness = (sims[i]->GetScore() + 1) * 10;
+                population.networks[i].fitness *= sims[i]->GetLifeSpan();
+                population.networks[i].fitness *= sims[i]->GetHitrate() * sims[i]->GetHitrate();
             }
 
             // Save best network

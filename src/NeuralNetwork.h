@@ -13,8 +13,8 @@ public:
     int numHidden;
     int numOutputs;
 
-    float mutationRate = 0.5f;
-    float crossoverRate = 0.05f;
+    float mutationRate = 0.1f;
+    float crossoverRate = 0.1f;
 
     float fitness = 0;
 
