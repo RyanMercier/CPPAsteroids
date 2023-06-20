@@ -125,6 +125,7 @@ public:
     void Initialize()
     {
         SetConfigFlags(FLAG_VSYNC_HINT);
+        SetTraceLogLevel(LOG_ERROR);
         InitWindow(screenWidth, screenHeight, "C++ Asteroids by Ryan Mercier");
         // SetTargetFPS(60);
 

@@ -13,12 +13,14 @@
 
 int rayCount = 12;
 int numInputs = rayCount + 5;
-int numHidden = rayCount + 5;
+int numHidden = rayCount + 5 + 5;
 int numOutputs = 4;
 double mutationRate = 0.01;
 double crossoverRate = 0.7;
+
 int populationSize = 500;
-int numGenerations = 500;
+int numGenerations = 200;
+int simsPerGeneration = 5;
 
 bool drawBest = true;
 
@@ -110,41 +112,46 @@ int main(int argc, char *argv[])
         {
             std::cout << "Computing Generation: " << generation + 1 << " / " << numGenerations << std::endl;
 
-            std::vector<std::unique_ptr<Simulation>> sims;
-            sims.push_back(std::make_unique<Simulation>(std::make_unique<NeuralNetwork>(population.networks[0]), rayCount, drawBest));
-
-            // Create simulations
-            for (int i = 1; i < populationSize; i++)
+            // Run multiple simulations per generation in order to mitigate super luck or unlucky runs
+            for (int i = 0; i < simsPerGeneration; i++)
             {
-                sims.push_back(std::make_unique<Simulation>(std::make_unique<NeuralNetwork>(population.networks[i]), rayCount, false));
-            }
+                std::vector<std::unique_ptr<Simulation>> sims;
+                sims.push_back(std::make_unique<Simulation>(std::make_unique<NeuralNetwork>(population.networks[0]), rayCount, drawBest));
 
-            // Run sim and Evaluate fitness for each individual in the population
-            bool alive = true;
-            while (alive)
-            {
-                alive = false;
-                for (int j = 0; j < sims.size(); j++)
+                // Create simulations
+                for (int i = 1; i < populationSize; i++)
                 {
-                    if (sims[j]->isAlive())
+                    sims.push_back(std::make_unique<Simulation>(std::make_unique<NeuralNetwork>(population.networks[i]), rayCount, false));
+                }
+
+                // Run sim and Evaluate fitness for each individual in the population
+                bool alive = true;
+                while (alive)
+                {
+                    alive = false;
+                    for (int j = 0; j < sims.size(); j++)
                     {
-                        sims[j]->Update();
-                        alive = true; // Set alive to true if any simulation is still alive
+                        if (sims[j]->isAlive())
+                        {
+                            sims[j]->Update();
+                            alive = true; // Set alive to true if any simulation is still alive
+                        }
                     }
                 }
-            }
 
-            // Update fitness values in the population
-            for (int i = 0; i < populationSize; i++)
-            {
-                population.networks[i].fitness = (sims[i]->GetScore() + 1) * 10;
-                population.networks[i].fitness *= sims[i]->GetLifeSpan();
-                population.networks[i].fitness *= sims[i]->GetHitrate() * sims[i]->GetHitrate();
+                // Update fitness values in the population
+                for (int i = 0; i < populationSize; i++)
+                {
+                    float fitness = (sims[i]->GetScore() + 1) * 10;
+                    fitness *= sims[i]->GetLifeSpan();
+                    fitness *= sims[i]->GetHitrate() * sims[i]->GetHitrate();
+                    population.networks[i].fitness += fitness;
+                }
             }
 
             // Save best network
             NeuralNetwork bestNet = population.GetBestNet();
-            std::cout << "Best Score of Generation: " << bestNet.fitness << std::endl;
+            std::cout << "Highest Fitness of Generation: " << bestNet.fitness << std::endl;
 
             if (generation <= numGenerations - 1)
             {

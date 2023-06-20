@@ -1,4 +1,5 @@
 #include "Simulation.h"
+#include <iostream>
 
 void Simulation::Update()
 {
@@ -10,7 +11,7 @@ void Simulation::Update()
         Vector2 playerVel = game->GetPlayerVelocity();
 
         // Update network inputs
-        inputs.push_back(game->GetPlayerRotation() / 100.0 - 0.5);
+        inputs.push_back(game->GetPlayerRotation() / 360.0);
         inputs.push_back(playerPos.x / 1000.0 - 0.5);
         inputs.push_back(playerPos.y / 1000.0 - 0.5);
         inputs.push_back(playerVel.x / 100.0 - 0.5);
