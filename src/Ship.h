@@ -19,10 +19,12 @@ class Ship
     const float dragAmount = 100.0f;
     const float rotationSpeed = 650.0f;
 
+    float simSpeed = 1.0f;
+
     std::vector<Vector2> vertices = {Vector2{10, 0}, Vector2{-10, -8}, Vector2{-10, 8}};
 
     // bullet control
-    float shotsPerSecond = 10;
+    float shotsPerSecond = 10.0f;
     std::chrono::system_clock::time_point lastShotTime = std::chrono::system_clock::now();
     std::vector<Projectile *> bullets;
 
@@ -35,10 +37,11 @@ public:
         velocity = Vector2{0, 0};
     }
 
-    Ship(Vector2 _position)
+    Ship(Vector2 _position, float _simSpeed)
     {
         position = _position;
         velocity = Vector2{0, 0};
+        simSpeed = _simSpeed;
     }
 
     Ship(const Ship &copy)
@@ -57,63 +60,25 @@ public:
         }
     }
 
-    bool IsAlive()
-    {
-        return alive;
-    }
+    bool IsAlive();
 
-    void SetAlive(bool _alive)
-    {
-        alive = _alive;
-    }
+    void SetAlive(bool _alive);
 
-    Vector2 GetPosition() const
-    {
-        return position;
-    }
+    Vector2 GetPosition() const;
 
-    void SetPosition(Vector2 _position)
-    {
-        position = _position;
-    }
+    void SetPosition(Vector2 _position);
 
-    Vector2 GetVelocity() const
-    {
-        return velocity;
-    }
+    Vector2 GetVelocity() const;
 
-    void SetVelocity(Vector2 _velocity)
-    {
-        velocity = _velocity;
-    }
+    void SetVelocity(Vector2 _velocity);
 
-    float GetRotation() const
-    {
-        return rotation;
-    }
+    float GetRotation() const;
 
-    void Rotate(float amount)
-    {
-        rotation += amount;
-        if (rotation > 360)
-        {
-            rotation -= 360;
-        }
-        else if (rotation < 0)
-        {
-            rotation += 360;
-        }
-    }
+    void Rotate(float amount);
 
-    int GetShotsFired()
-    {
-        return shotsFired;
-    }
+    int GetShotsFired();
 
-    std::vector<Projectile *> GetBullets()
-    {
-        return bullets;
-    }
+    std::vector<Projectile *> GetBullets();
 
     std::vector<Vector2> GetVertices() const;
 

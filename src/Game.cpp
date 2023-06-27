@@ -1,5 +1,82 @@
 #include "Game.h"
 
+bool Game::IsAlive()
+{
+    return player->IsAlive();
+}
+
+Vector2 Game::GetPlayerPosition()
+{
+    return player->GetPosition();
+}
+
+Vector2 Game::GetPlayerVelocity()
+{
+    return player->GetVelocity();
+}
+
+float Game::GetPlayerRotation()
+{
+    return player->GetRotation();
+}
+
+std::unique_ptr<Controller> &Game::GetController()
+{
+    return controller;
+}
+
+std::unique_ptr<Ship> &Game::GetPlayer()
+{
+    return player;
+}
+
+std::vector<Asteroid *> Game::GetAsteroids()
+{
+    return asteroids;
+}
+
+int Game::GetScore()
+{
+    return score;
+}
+
+float Game::GetHitrate()
+{
+    return (player->GetShotsFired() + 1.0f) / score;
+}
+
+void Game::Initialize()
+{
+    SetConfigFlags(FLAG_VSYNC_HINT);
+    SetTraceLogLevel(LOG_ERROR);
+    InitWindow(screenWidth, screenHeight, "C++ Asteroids by Ryan Mercier");
+    // SetTargetFPS(60);
+
+    backgroundColor = Color{0, 0, 0, 0};
+}
+
+int Game::Run(float simSpeed)
+{
+    if (player->IsAlive())
+    {
+        Update(simSpeed);
+        if (draw && !WindowShouldClose())
+        {
+            Draw();
+        }
+    }
+
+    return score;
+}
+
+void Game::Close()
+{
+    if (draw)
+    {
+        CloseWindow();
+    }
+}
+
 void Game::SpawnAsteroids()
 {
     // Spawn Asteroids
@@ -23,7 +100,7 @@ void Game::SpawnAsteroids()
     }
 }
 
-void Game::HandleCollisions(float _deltaTime)
+void Game::HandleCollisions(float deltaTime)
 {
     std::vector<Asteroid *> asteroidsToAdd;
     std::vector<Asteroid *> asteroidsToRemove;
@@ -50,7 +127,7 @@ void Game::HandleCollisions(float _deltaTime)
                     asteroid->SetAlive(false);
                     p->SetAlive(false);
 
-                    if (asteroidRadius > 25)
+                    if (asteroidRadius > 30)
                     {
                         int splitCount = GetRandomValue(2, 3);
                         for (int j = 0; j < splitCount; j++)
@@ -90,7 +167,7 @@ void Game::HandleCollisions(float _deltaTime)
                 }
             }
 
-            asteroid->Update(_deltaTime);
+            asteroid->Update(deltaTime);
         }
     }
 
@@ -110,28 +187,34 @@ void Game::HandleCollisions(float _deltaTime)
     asteroidsToAdd.clear();
 }
 
-void Game::HandleAsteroids(float _deltaTime)
+void Game::HandleAsteroids(float deltaTime)
 {
     // Difficulty Control
-    if (score >= lastDifficultyScore + 20)
+    if (score >= lastDifficultyScore + 10)
     {
         lastDifficultyScore = score;
+        // Spawn an asteroid headed for the center to discourage sitting in the middle
+        asteroids.push_back(new Asteroid(Vector2{-25, -25}, 45, GetRandomValue(50, 300), GetRandomValue(10, 100)));
         maxAsteroids++;
     }
 
     SpawnAsteroids();
-    HandleCollisions(_deltaTime); // and update asteroids
+    HandleCollisions(deltaTime); // and update asteroids
 }
 
-void Game::Update()
+void Game::Update(float simSpeed)
 {
     if (player->IsAlive())
     {
-        controller->Update(GetFrameTime());
-        player->Update(GetFrameTime());
+        // this will cause a problem if draw is set to false
+        controller->Update(simSpeed * GetFrameTime());
+        player->Update(simSpeed * GetFrameTime());
+
+        // controller->Update(simSpeed * GetFrameTime());
+        // player->Update(simSpeed * GetFrameTime());
     }
 
-    HandleAsteroids(GetFrameTime());
+    HandleAsteroids(simSpeed * GetFrameTime());
 }
 
 void Game::Draw()

@@ -1,4 +1,63 @@
 #include "Ship.h"
+#include <iostream>
+
+bool Ship::IsAlive()
+{
+    return alive;
+}
+
+void Ship::SetAlive(bool _alive)
+{
+    alive = _alive;
+}
+
+Vector2 Ship::GetPosition() const
+{
+    return position;
+}
+
+void Ship::SetPosition(Vector2 _position)
+{
+    position = _position;
+}
+
+Vector2 Ship::GetVelocity() const
+{
+    return velocity;
+}
+
+void Ship::SetVelocity(Vector2 _velocity)
+{
+    velocity = _velocity;
+}
+
+float Ship::GetRotation() const
+{
+    return rotation;
+}
+
+void Ship::Rotate(float amount)
+{
+    rotation += amount;
+    if (rotation > 360)
+    {
+        rotation -= 360;
+    }
+    else if (rotation < 0)
+    {
+        rotation += 360;
+    }
+}
+
+int Ship::GetShotsFired()
+{
+    return shotsFired;
+}
+
+std::vector<Projectile *> Ship::GetBullets()
+{
+    return bullets;
+}
 
 // Actions
 void Ship::TurnLeft(float _deltaTime)
@@ -55,11 +114,11 @@ void Ship::Move(float _deltaTime)
 void Ship::Shoot()
 {
     // check fire rate
-    float shotTime = 1.0f / shotsPerSecond;
+    float shotTime = 1.0f / shotsPerSecond / simSpeed;
     auto currentTime = std::chrono::system_clock::now();
 
     std::chrono::duration<double> elapsed_seconds = currentTime - lastShotTime;
-    if (elapsed_seconds.count() >= shotTime)
+    if (elapsed_seconds.count() > shotTime)
     {
         bullets.push_back(new Projectile(position, rotation));
         lastShotTime = currentTime;

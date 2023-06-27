@@ -11,16 +11,18 @@
 #include "Simulation.h"
 #include "Population.h"
 
+// Configuration
 int rayCount = 12;
 int numInputs = rayCount + 5;
-int numHidden = rayCount + 5 + 5;
+int numHidden = 17;
 int numOutputs = 4;
-double mutationRate = 0.01;
+double mutationRate = 0.05;
 double crossoverRate = 0.7;
 
 int populationSize = 500;
 int numGenerations = 200;
-int simsPerGeneration = 5;
+int simsPerGeneration = 10;
+float simSpeed = 1.0f;
 
 bool drawBest = true;
 
@@ -89,20 +91,60 @@ NeuralNetwork LoadFromFile(const std::string &filePath)
         outputLayer.push_back(ParseNeuron(neuronData));
     }
 
-    for (int i = 0; i < hiddenLayer.size(); i++)
-    {
-        std::cout << hiddenLayer[i].ToString() << std::endl;
-    }
+    std::cout << "Network Fitness: " << sFitness << std::endl;
 
     file.close();
 
     return NeuralNetwork(sNumInputs, sNumHidden, sNumOutputs, sMutationRate, sCrossoverRate, hiddenLayer, outputLayer);
 }
 
+float CalculateFitness(const std::unique_ptr<Simulation> &sim)
+{
+    float fitness = (sim->GetScore() + 1) * 10;
+    fitness *= sim->GetLifeSpan();
+    fitness *= sim->GetHitrate() * sim->GetHitrate();
+    return fitness / 1000000;
+}
+
 int main(int argc, char *argv[])
 {
-    if (argc == 1)
+    std::cout << "Load Network from File? (y/n): ";
+    std::string loadInput;
+    std::cin >> loadInput;
+    bool loadFromFile = loadInput == "y" || loadInput == "Y";
+
+    if (!loadFromFile)
     {
+        // Specify network properties
+        std::cout << "Enter Number of Raycasts: ";
+        std::cin >> rayCount;
+
+        std::cout << "Enter Number of Hidden Neurons: ";
+        std::cin >> numHidden;
+
+        std::cout << "Enter Mutation Rate as Decimal from 0.0 to 1.0: ";
+        std::cin >> mutationRate;
+
+        std::cout << "Enter Crossover Rate as Decimal from 0.0 to 1.0: ";
+        std::cin >> crossoverRate;
+
+        std::cout << "Enter Population Size: ";
+        std::cin >> populationSize;
+
+        std::cout << "Enter Number of Generations: ";
+        std::cin >> numGenerations;
+
+        std::cout << "Enter Number of Simulations per Generation: ";
+        std::cin >> simsPerGeneration;
+
+        std::cout << "Enter Simulation Speed: ";
+        std::cin >> simSpeed;
+
+        // std::cout << "Draw Best Simulation? (y/n): ";
+        // std::string drawBestInput;
+        // std::cin >> drawBestInput;
+        // drawBest = drawBestInput == "y" || drawBestInput == "Y";
+
         std::cout << "Begin Training ..." << std::endl;
         // Create initial population
         Population population = Population(populationSize, numInputs, numHidden, numOutputs, mutationRate, crossoverRate);
@@ -112,26 +154,26 @@ int main(int argc, char *argv[])
         {
             std::cout << "Computing Generation: " << generation + 1 << " / " << numGenerations << std::endl;
 
-            // Run multiple simulations per generation in order to mitigate super luck or unlucky runs
+            // Run multiple simulations per generation to mitigate luck
             for (int i = 0; i < simsPerGeneration; i++)
             {
                 std::vector<std::unique_ptr<Simulation>> sims;
-                sims.push_back(std::make_unique<Simulation>(std::make_unique<NeuralNetwork>(population.networks[0]), rayCount, drawBest));
+                sims.push_back(std::make_unique<Simulation>(std::make_unique<NeuralNetwork>(population.networks[0]), rayCount, drawBest, simSpeed));
 
                 // Create simulations
                 for (int i = 1; i < populationSize; i++)
                 {
-                    sims.push_back(std::make_unique<Simulation>(std::make_unique<NeuralNetwork>(population.networks[i]), rayCount, false));
+                    sims.push_back(std::make_unique<Simulation>(std::make_unique<NeuralNetwork>(population.networks[i]), rayCount, false, simSpeed));
                 }
 
-                // Run sim and Evaluate fitness for each individual in the population
+                // Run simulations and evaluate fitness
                 bool alive = true;
                 while (alive)
                 {
                     alive = false;
                     for (int j = 0; j < sims.size(); j++)
                     {
-                        if (sims[j]->isAlive())
+                        if (sims[j]->IsAlive())
                         {
                             sims[j]->Update();
                             alive = true; // Set alive to true if any simulation is still alive
@@ -142,9 +184,7 @@ int main(int argc, char *argv[])
                 // Update fitness values in the population
                 for (int i = 0; i < populationSize; i++)
                 {
-                    float fitness = (sims[i]->GetScore() + 1) * 10;
-                    fitness *= sims[i]->GetLifeSpan();
-                    fitness *= sims[i]->GetHitrate() * sims[i]->GetHitrate();
+                    float fitness = CalculateFitness(sims[i]);
                     population.networks[i].fitness += fitness;
                 }
             }
@@ -155,7 +195,7 @@ int main(int argc, char *argv[])
 
             if (generation <= numGenerations - 1)
             {
-                // GENETIC ALGORITHM
+                // Genetic algorithm
                 population.Reproduce();
             }
         }
@@ -172,25 +212,28 @@ int main(int argc, char *argv[])
         }
         else
         {
-            std::cout << "Unable to open file";
+            std::cout << "Unable to open file" << std::endl;
         }
     }
 
-    // Load Network
+    // Load network
     else
     {
-        std::cout << "Loading Network ..." << std::endl;
-        std::ifstream file(argv[1]);
+        std::cout << "Enter File Path: ";
+        std::string filePath;
+        std::cin >> filePath;
+        std::cout << "Loading Network..." << std::endl;
+        std::ifstream file(filePath);
         if (!file)
         {
-            // Handle file open error
+            std::cout << "Error opening file" << std::endl;
             return 0;
         }
 
-        NeuralNetwork net = LoadFromFile(argv[1]);
-        std::unique_ptr<Simulation> sim = std::make_unique<Simulation>(std::make_unique<NeuralNetwork>(net), rayCount, true);
+        NeuralNetwork net = LoadFromFile(filePath);
+        std::unique_ptr<Simulation> sim = std::make_unique<Simulation>(std::make_unique<NeuralNetwork>(net), rayCount, true, 1.0f);
 
-        while (sim->isAlive())
+        while (sim->IsAlive())
         {
             sim->Update();
         }

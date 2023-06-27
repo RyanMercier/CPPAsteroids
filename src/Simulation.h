@@ -16,14 +16,15 @@ class Simulation
     std::unique_ptr<Controller> controller;
     int rayCount = 0;
     std::vector<double> inputs;
+    float simSpeed;
 
     std::chrono::system_clock::time_point simsStartTime;
 
 public:
-    Simulation(std::unique_ptr<NeuralNetwork> _network, int _rayCount, bool _draw)
-        : network(std::move(_network)), rayCount(_rayCount)
+    Simulation(std::unique_ptr<NeuralNetwork> _network, int _rayCount, bool _draw, float _simSpeed)
+        : network(std::move(_network)), rayCount(_rayCount), simSpeed(_simSpeed)
     {
-        game = std::make_unique<Game>(true, _draw);
+        game = std::make_unique<Game>(true, _draw, simSpeed);
         inputs = std::vector<double>();
     }
 
@@ -33,27 +34,13 @@ public:
 
     void Update();
 
-    bool isAlive()
-    {
-        return game->IsAlive();
-    }
+    bool IsAlive();
 
-    int GetScore()
-    {
-        return game->GetScore();
-    }
+    int GetScore();
 
-    int GetLifeSpan()
-    {
-        auto currentTime = std::chrono::system_clock::now();
-        std::chrono::duration<double> elapsed_seconds = currentTime - simsStartTime;
-        return elapsed_seconds.count();
-    }
+    int GetLifeSpan();
 
-    int GetHitrate()
-    {
-        return game->GetHitrate();
-    }
+    int GetHitrate();
 
     std::vector<double> GetAsteroidInputs(Vector2 playerPos);
 };

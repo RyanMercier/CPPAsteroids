@@ -21,7 +21,7 @@ class Game
     bool draw = true;
 
     // Asteroid Control
-    int maxAsteroids = 20;
+    int maxAsteroids = 5;
     int lastDifficultyScore = 0; // the last score max asteroids was increased at
     int scorePerDifficultyIncrease = 10;
     double minAsteroidSpeed = 0.05;
@@ -43,11 +43,11 @@ public:
             Initialize();
         }
         Vector2 startPosition = Vector2{screenWidth / 2.0f, screenHeight / 2.0f};
-        player = std::make_unique<Ship>(startPosition);
+        player = std::make_unique<Ship>(startPosition, 1.0f);
         controller = std::make_unique<KeyBoardController>(player.get());
     }
 
-    Game(bool network, bool _draw)
+    Game(bool _network, bool _draw, float _simSpeed)
     {
         draw = _draw;
         if (draw)
@@ -55,9 +55,9 @@ public:
             Initialize();
         }
         Vector2 startPosition = Vector2{screenWidth / 2.0f, screenHeight / 2.0f};
-        player = std::make_unique<Ship>(startPosition);
+        player = std::make_unique<Ship>(startPosition, _simSpeed);
 
-        if (network)
+        if (_network)
         {
             controller = std::make_unique<NetworkController>(player.get());
         }
@@ -77,90 +77,33 @@ public:
         Close();
     }
 
-    bool IsAlive()
-    {
-        return player->IsAlive();
-    }
+    bool IsAlive();
 
-    Vector2 GetPlayerPosition()
-    {
-        return player->GetPosition();
-    }
+    Vector2 GetPlayerPosition();
+    Vector2 GetPlayerVelocity();
+    float GetPlayerRotation();
 
-    Vector2 GetPlayerVelocity()
-    {
-        return player->GetVelocity();
-    }
+    std::unique_ptr<Controller> &GetController();
+    std::unique_ptr<Ship> &GetPlayer();
 
-    float GetPlayerRotation()
-    {
-        return player->GetRotation();
-    }
+    std::vector<Asteroid *> GetAsteroids();
 
-    std::unique_ptr<Controller> &GetController()
-    {
-        return controller;
-    }
+    int GetScore();
+    float GetHitrate();
 
-    std::unique_ptr<Ship> &GetPlayer()
-    {
-        return player;
-    }
+    void Initialize();
 
-    std::vector<Asteroid *> GetAsteroids()
-    {
-        return asteroids;
-    }
+    int Run(float simSpeed);
 
-    int GetScore()
-    {
-        return score;
-    }
-
-    float GetHitrate()
-    {
-        return player->GetShotsFired() + 1 / score;
-    }
-
-    void Initialize()
-    {
-        SetConfigFlags(FLAG_VSYNC_HINT);
-        SetTraceLogLevel(LOG_ERROR);
-        InitWindow(screenWidth, screenHeight, "C++ Asteroids by Ryan Mercier");
-        // SetTargetFPS(60);
-
-        backgroundColor = Color{0, 0, 0, 0};
-    }
-
-    int Run()
-    {
-        if (player->IsAlive())
-        {
-            Update();
-            if (draw && !WindowShouldClose())
-            {
-                Draw();
-            }
-        }
-
-        return score;
-    }
-
-    void Close()
-    {
-        if (draw)
-        {
-            CloseWindow();
-        }
-    }
+    void Close();
 
     void SpawnAsteroids();
 
-    void HandleCollisions(float _deltaTime);
+    void HandleCollisions(float deltaTime);
 
-    void HandleAsteroids(float _deltaTime);
+    void HandleAsteroids(float deltaTime);
 
-    void Update();
+    void Update(float simSpeed);
 
     void Draw();
 };

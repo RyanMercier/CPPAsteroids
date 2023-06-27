@@ -1,11 +1,32 @@
 #include "Simulation.h"
-#include <iostream>
+
+bool Simulation::IsAlive()
+{
+    return game->IsAlive();
+}
+
+int Simulation::GetScore()
+{
+    return game->GetScore();
+}
+
+int Simulation::GetLifeSpan()
+{
+    auto currentTime = std::chrono::system_clock::now();
+    std::chrono::duration<double> elapsed_seconds = currentTime - simsStartTime;
+    return elapsed_seconds.count();
+}
+
+int Simulation::GetHitrate()
+{
+    return game->GetHitrate();
+}
 
 void Simulation::Update()
 {
     if (game->IsAlive())
     {
-        game->Run();
+        game->Run(simSpeed);
 
         Vector2 playerPos = game->GetPlayerPosition();
         Vector2 playerVel = game->GetPlayerVelocity();
