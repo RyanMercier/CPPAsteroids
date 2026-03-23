@@ -3,6 +3,7 @@
 
 #include "raylib.h"
 #include "raymath.h"
+#include "Config.h"
 
 class Asteroid
 {
@@ -63,7 +64,8 @@ public:
         int screenWidth = GetScreenWidth();
         int screenHeight = GetScreenHeight();
 
-        if (position.x < -150 || position.x > screenWidth + 150 || position.y < -150 || position.y > screenHeight + 150)
+        float buf = Config::Asteroid::OFFSCREEN_BUFFER;
+        if (position.x < -buf || position.x > screenWidth + buf || position.y < -buf || position.y > screenHeight + buf)
         {
             alive = false;
         }
@@ -71,7 +73,7 @@ public:
 
     void Draw()
     {
-        DrawPolyLines(position, 5 + (int)(radius / 5), radius, rotation, RAYWHITE);
+        DrawPolyLines(position, Config::Asteroid::POLY_BASE_SIDES + (int)(radius / Config::Asteroid::POLY_RADIUS_DIVISOR), radius, rotation, RAYWHITE);
     }
 };
 

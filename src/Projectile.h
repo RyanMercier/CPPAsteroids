@@ -3,14 +3,15 @@
 
 #include "raylib.h"
 #include "raymath.h"
+#include "Config.h"
 
 class Projectile
 {
     bool alive = true;
     Vector2 position;
     Vector2 velocity = { 0, 0 };
-    float speed = 700;
-    float radius = 1.5;
+    float speed = Config::Projectile::SPEED;
+    float radius = Config::Projectile::RADIUS;
 
 public:
     Projectile(Vector2 _position, float _direction)

@@ -1,4 +1,5 @@
 #include "NeuralNetwork.h"
+#include "Config.h"
 
 void NeuralNetwork::SetFitness(float _fitness)
 {
@@ -98,10 +99,10 @@ void NeuralNetwork::mutateNeuron(Neuron &neuron)
     {
         if (shouldMutate())
         {
-            float deltaWeight = randomWeight() * 0.1f;
+            float deltaWeight = randomWeight() * Config::Network::MUTATION_DELTA_SCALE;
             neuron.inputWeights[i] += deltaWeight;
 
-            if (neuron.inputWeights[i] > 1.0f || neuron.inputWeights[i] < -1.0f)
+            if (neuron.inputWeights[i] > Config::Network::WEIGHT_CLIP || neuron.inputWeights[i] < -Config::Network::WEIGHT_CLIP)
             {
                 neuron.inputWeights[i] -= 2.0f * deltaWeight;
             }
@@ -110,10 +111,10 @@ void NeuralNetwork::mutateNeuron(Neuron &neuron)
 
     if (shouldMutate())
     {
-        float deltaBias = randomBias() * 0.1f;
+        float deltaBias = randomBias() * Config::Network::MUTATION_DELTA_SCALE;
         neuron.inputBias += deltaBias;
 
-        if (neuron.inputBias > 1.0f || neuron.inputBias < -1.0f)
+        if (neuron.inputBias > Config::Network::WEIGHT_CLIP || neuron.inputBias < -Config::Network::WEIGHT_CLIP)
         {
             neuron.inputBias -= 2.0f * deltaBias;
         }
@@ -141,7 +142,7 @@ void NeuralNetwork::crossoverNeuron(Neuron &neuron, const Neuron &other)
     {
         if (shouldCrossover())
         {
-            double alpha = 0.7; // Blend factor (adjust as needed)
+            double alpha = Config::Network::CROSSOVER_BLEND_ALPHA;
             double newWeight = alpha * neuron.inputWeights[i] + (1 - alpha) * other.inputWeights[i];
             neuron.inputWeights[i] = newWeight;
         }
@@ -149,7 +150,7 @@ void NeuralNetwork::crossoverNeuron(Neuron &neuron, const Neuron &other)
 
     if (shouldCrossover())
     {
-        double alpha = 0.7; // Blend factor (adjust as needed)
+        double alpha = Config::Network::CROSSOVER_BLEND_ALPHA;
         double newBias = alpha * neuron.inputBias + (1 - alpha) * other.inputBias;
         neuron.inputBias = newBias;
     }

@@ -1,4 +1,5 @@
 #include "Ship.h"
+#include "Config.h"
 #include <iostream>
 
 bool Ship::IsAlive()
@@ -89,7 +90,7 @@ void Ship::Drag(float _deltaTime)
 
     // Check if velocity magnitude is less than threshold, and if so, set velocity to zero
     // This prevents drag from causing the ship to move backwards
-    if (Vector2Length(velocity) < 1)
+    if (Vector2Length(velocity) < Config::Ship::VELOCITY_STOP_THRESHOLD)
     {
         velocity = Vector2{0.0f, 0.0f};
     }

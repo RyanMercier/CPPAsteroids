@@ -6,6 +6,7 @@
 #include <memory>
 #include <algorithm>
 #include <raylib.h>
+#include "Config.h"
 #include "Ship.h"
 #include "Asteroid.h"
 #include "KeyBoardController.h"
@@ -14,19 +15,14 @@
 class Game
 {
 
-    // Window Settings
-    const int screenWidth = 1000;
-    const int screenHeight = 1000;
     Color backgroundColor;
     bool draw = true;
+    bool ownsWindow = true; // false when main already created the window
 
     // Asteroid Control
-    int maxAsteroids = 5;
-    int lastDifficultyScore = 0; // the last score max asteroids was increased at
-    int scorePerDifficultyIncrease = 10;
-    double minAsteroidSpeed = 0.05;
-    double maxAsteroidSpeed = 0.2;
-    double asteroidUpdateTime = 0.1; // how many seconds between checking if another asteroid is neccessary
+    int maxAsteroids = Config::Asteroid::INITIAL_MAX;
+    int lastDifficultyScore = 0;
+    double asteroidUpdateTime = Config::Asteroid::SPAWN_INTERVAL;
     std::chrono::system_clock::time_point lastAsteroidTime = std::chrono::system_clock::now();
 
     std::unique_ptr<Controller> controller;
@@ -35,6 +31,9 @@ class Game
 
     int score = 0;
 
+    // For non-drawn sims, use a fixed timestep instead of GetFrameTime()
+    float fixedTimestep = 1.0f / 60.0f;
+
 public:
     Game()
     {
@@ -42,19 +41,21 @@ public:
         {
             Initialize();
         }
-        Vector2 startPosition = Vector2{screenWidth / 2.0f, screenHeight / 2.0f};
+        Vector2 startPosition = Vector2{Config::Screen::WIDTH / 2.0f, Config::Screen::HEIGHT / 2.0f};
         player = std::make_unique<Ship>(startPosition, 1.0f);
         controller = std::make_unique<KeyBoardController>(player.get());
     }
 
-    Game(bool _network, bool _draw, float _simSpeed)
+    Game(bool _network, bool _draw, float _simSpeed, bool _ownsWindow = true)
     {
         draw = _draw;
-        if (draw)
+        ownsWindow = _ownsWindow;
+        if (draw && ownsWindow)
         {
             Initialize();
         }
-        Vector2 startPosition = Vector2{screenWidth / 2.0f, screenHeight / 2.0f};
+        backgroundColor = Color{0, 0, 0, 0};
+        Vector2 startPosition = Vector2{Config::Screen::WIDTH / 2.0f, Config::Screen::HEIGHT / 2.0f};
         player = std::make_unique<Ship>(startPosition, _simSpeed);
 
         if (_network)
@@ -90,6 +91,7 @@ public:
 
     int GetScore();
     float GetHitrate();
+    int GetShotsFired();
 
     void Initialize();
 

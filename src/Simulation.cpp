@@ -1,4 +1,5 @@
 #include "Simulation.h"
+#include "Config.h"
 
 bool Simulation::IsAlive()
 {
@@ -22,21 +23,28 @@ int Simulation::GetHitrate()
     return game->GetHitrate();
 }
 
+int Simulation::GetShotsFired()
+{
+    return game->GetShotsFired();
+}
+
 void Simulation::Update()
 {
     if (game->IsAlive())
     {
-        game->Run(simSpeed);
+        game->Run(*simSpeedPtr);
 
         Vector2 playerPos = game->GetPlayerPosition();
         Vector2 playerVel = game->GetPlayerVelocity();
 
-        // Update network inputs
-        inputs.push_back(game->GetPlayerRotation() / 360.0);
-        inputs.push_back(playerPos.x / 1000.0 - 0.5);
-        inputs.push_back(playerPos.y / 1000.0 - 0.5);
-        inputs.push_back(playerVel.x / 100.0 - 0.5);
-        inputs.push_back(playerVel.y / 100.0 - 0.5);
+        // Update network inputs - all normalized to [-1, 1]
+        float halfW = Config::Screen::WIDTH / 2.0f;
+        float halfH = Config::Screen::HEIGHT / 2.0f;
+        inputs.push_back(game->GetPlayerRotation() / 180.0 - 1.0);    // [0,360] -> [-1,1]
+        inputs.push_back(playerPos.x / halfW - 1.0);                  // [0,WIDTH] -> [-1,1]
+        inputs.push_back(playerPos.y / halfH - 1.0);                  // [0,HEIGHT] -> [-1,1]
+        inputs.push_back(playerVel.x / Config::Ship::MAX_SPEED);      // [-MAX,MAX] -> [-1,1]
+        inputs.push_back(playerVel.y / Config::Ship::MAX_SPEED);      // [-MAX,MAX] -> [-1,1]
 
         std::vector<double> asteroidInputs = GetAsteroidInputs(playerPos);
         inputs.insert(inputs.end(), asteroidInputs.begin(), asteroidInputs.end());
@@ -54,15 +62,17 @@ std::vector<double> Simulation::GetAsteroidInputs(Vector2 playerPos)
 {
     std::vector<double> result;
 
-    // Raycast for network inputs
+    // Raycast for network inputs - relative to ship rotation
     float deltaAngle = 360.0f / rayCount;
+    float playerRotation = game->GetPlayerRotation();
     std::vector<Asteroid *> asteroids = game->GetAsteroids();
 
     for (int j = 0; j < rayCount; j++)
     {
-        Vector3 rayVector = {cos(deltaAngle * j * PI / 180.0f), sin(deltaAngle * j * PI / 180.0f), 0};
+        float rayAngle = (playerRotation + deltaAngle * j) * PI / 180.0f;
+        Vector3 rayVector = {cos(rayAngle), sin(rayAngle), 0};
         Ray r = {{playerPos.x, playerPos.y, 0}, rayVector};
-        float shortestDistance = 1000; // Arbitrary number in this case about screenwidth
+        float shortestDistance = Config::Training::RAYCAST_MAX_DIST;
         Vector2 closestPoint = playerPos;
 
         for (auto asteroid : asteroids)
@@ -77,7 +87,8 @@ std::vector<double> Simulation::GetAsteroidInputs(Vector2 playerPos)
             }
         }
 
-        result.push_back(shortestDistance / 1000.0 - 0.5);
+        float halfMax = Config::Training::RAYCAST_MAX_DIST / 2.0f;
+        result.push_back(shortestDistance / halfMax - 1.0);  // [0,MAX] -> [-1,1]
     }
 
     return result;

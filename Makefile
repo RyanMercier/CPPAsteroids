@@ -82,8 +82,8 @@ endif
 
 ifeq ($(PLATFORM),PLATFORM_DESKTOP)
     ifeq ($(PLATFORM_OS),LINUX)
-        RAYLIB_PREFIX ?= ..
-        RAYLIB_PATH    = $(realpath $(RAYLIB_PREFIX))
+        RAYLIB_PATH    = /usr/local
+        EXT =
     endif
 endif
 ifeq ($(PLATFORM),PLATFORM_RPI)
@@ -202,7 +202,7 @@ ifeq ($(PLATFORM),PLATFORM_DESKTOP)
         INCLUDE_PATHS += -I/usr/local/include
     endif
     ifeq ($(PLATFORM_OS),LINUX)
-        INCLUDE_PATHS = -I$(RAYLIB_H_INSTALL_PATH) -isystem. -isystem$(RAYLIB_PATH)/src -isystem$(RAYLIB_PATH)/release/include -isystem$(RAYLIB_PATH)/src/external
+        INCLUDE_PATHS = -I. -I/usr/local/include
     endif
 endif
 
@@ -220,7 +220,7 @@ ifeq ($(PLATFORM),PLATFORM_DESKTOP)
         LDFLAGS += -L. -Lsrc -L/usr/local/lib
     endif
     ifeq ($(PLATFORM_OS),LINUX)
-        LDFLAGS = -L. -L$(RAYLIB_INSTALL_PATH) -L$(RAYLIB_RELEASE_PATH)
+        LDFLAGS = -L. -L/usr/local/lib
     endif
 endif
 

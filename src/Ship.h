@@ -5,6 +5,7 @@
 #include <chrono>
 #include "raylib.h"
 #include "raymath.h"
+#include "Config.h"
 #include "Projectile.h"
 
 class Ship
@@ -12,19 +13,19 @@ class Ship
     bool alive = true;
     Vector2 position = Vector2{0, 0};
     Vector2 velocity = Vector2{0, 0};
-    float rotation = 90.0f;
-    const float baseSpeed = 20.0f;
-    const float maxSpeed = 500.0f;
-    const float acceleration = 200.0f;
-    const float dragAmount = 100.0f;
-    const float rotationSpeed = 650.0f;
+    float rotation = Config::Ship::START_ROTATION;
+    const float baseSpeed = Config::Ship::BASE_SPEED;
+    const float maxSpeed = Config::Ship::MAX_SPEED;
+    const float acceleration = Config::Ship::ACCELERATION;
+    const float dragAmount = Config::Ship::DRAG;
+    const float rotationSpeed = Config::Ship::ROTATION_SPEED;
 
     float simSpeed = 1.0f;
 
     std::vector<Vector2> vertices = {Vector2{10, 0}, Vector2{-10, -8}, Vector2{-10, 8}};
 
     // bullet control
-    float shotsPerSecond = 10.0f;
+    float shotsPerSecond = Config::Ship::SHOTS_PER_SECOND;
     std::chrono::system_clock::time_point lastShotTime = std::chrono::system_clock::now();
     std::vector<Projectile *> bullets;
 

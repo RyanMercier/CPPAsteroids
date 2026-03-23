@@ -42,15 +42,19 @@ int Game::GetScore()
 
 float Game::GetHitrate()
 {
-    return (player->GetShotsFired() + 1.0f) / score;
+    return (score + 1.0f) / (player->GetShotsFired() + 1.0f);
+}
+
+int Game::GetShotsFired()
+{
+    return player->GetShotsFired();
 }
 
 void Game::Initialize()
 {
     SetConfigFlags(FLAG_VSYNC_HINT);
     SetTraceLogLevel(LOG_ERROR);
-    InitWindow(screenWidth, screenHeight, "C++ Asteroids by Ryan Mercier");
-    // SetTargetFPS(60);
+    InitWindow(Config::Screen::WIDTH, Config::Screen::HEIGHT, "C++ Asteroids by Ryan Mercier");
 
     backgroundColor = Color{0, 0, 0, 0};
 }
@@ -60,7 +64,7 @@ int Game::Run(float simSpeed)
     if (player->IsAlive())
     {
         Update(simSpeed);
-        if (draw && !WindowShouldClose())
+        if (draw && (ownsWindow ? !WindowShouldClose() : true))
         {
             Draw();
         }
@@ -71,7 +75,7 @@ int Game::Run(float simSpeed)
 
 void Game::Close()
 {
-    if (draw)
+    if (draw && ownsWindow)
     {
         CloseWindow();
     }
@@ -79,19 +83,20 @@ void Game::Close()
 
 void Game::SpawnAsteroids()
 {
-    // Spawn Asteroids
     if (asteroids.size() < maxAsteroids)
     {
         auto currentTime = std::chrono::system_clock::now();
         std::chrono::duration<double> elapsed_seconds = currentTime - lastAsteroidTime;
         if (elapsed_seconds.count() >= asteroidUpdateTime)
         {
-            float xPos = GetRandomValue(-100, screenWidth + 100);
-            float yPos = GetRandomValue(-100, screenHeight + 100);
-            while ((xPos > -50 && xPos < screenWidth + 50) && (yPos > -50 && yPos < screenHeight + 50))
+            int buf = (int)Config::Asteroid::SPAWN_BUFFER;
+            int exc = (int)Config::Asteroid::SPAWN_EXCLUSION;
+            float xPos = GetRandomValue(-buf, Config::Screen::WIDTH + buf);
+            float yPos = GetRandomValue(-buf, Config::Screen::HEIGHT + buf);
+            while ((xPos > -exc && xPos < Config::Screen::WIDTH + exc) && (yPos > -exc && yPos < Config::Screen::HEIGHT + exc))
             {
-                xPos = GetRandomValue(-100, screenWidth + 100);
-                yPos = GetRandomValue(-100, screenHeight + 100);
+                xPos = GetRandomValue(-buf, Config::Screen::WIDTH + buf);
+                yPos = GetRandomValue(-buf, Config::Screen::HEIGHT + buf);
             }
 
             asteroids.push_back(new Asteroid(Vector2{xPos, yPos}, GetRandomValue(-90, 90), GetRandomValue(50, 300), GetRandomValue(10, 100)));
@@ -127,7 +132,7 @@ void Game::HandleCollisions(float deltaTime)
                     asteroid->SetAlive(false);
                     p->SetAlive(false);
 
-                    if (asteroidRadius > 30)
+                    if (asteroidRadius > Config::Asteroid::MIN_SPLIT_RADIUS)
                     {
                         int splitCount = GetRandomValue(2, 3);
                         for (int j = 0; j < splitCount; j++)
@@ -140,24 +145,17 @@ void Game::HandleCollisions(float deltaTime)
                     {
                         score++;
                     }
-
-                    // delete p;
-                    // bullet = bullets.erase(bullet);
                 }
-                // else
-                // {
-                //     ++bullet;
-                // }
 
                 bullet++;
             }
 
-            if (Vector2Distance(asteroid->GetPosition(), player->GetPosition()) <= asteroidRadius + 2 && player->IsAlive())
+            if (Vector2Distance(asteroid->GetPosition(), player->GetPosition()) <= asteroidRadius + Config::Asteroid::COLLISION_PADDING && player->IsAlive())
             {
                 player->SetAlive(false);
                 asteroid->SetAlive(false);
 
-                if (asteroidRadius > 20)
+                if (asteroidRadius > Config::Asteroid::COLLISION_SPLIT_MIN_RADIUS)
                 {
                     int splitCount = GetRandomValue(5, 15);
                     for (int j = 0; j < splitCount; j++)
@@ -189,40 +187,45 @@ void Game::HandleCollisions(float deltaTime)
 
 void Game::HandleAsteroids(float deltaTime)
 {
-    // Difficulty Control
-    if (score >= lastDifficultyScore + 10)
+    if (score >= lastDifficultyScore + Config::Asteroid::DIFFICULTY_INTERVAL)
     {
         lastDifficultyScore = score;
-        // Spawn an asteroid headed for the center to discourage sitting in the middle
         asteroids.push_back(new Asteroid(Vector2{-25, -25}, 45, GetRandomValue(50, 300), GetRandomValue(10, 100)));
         maxAsteroids++;
     }
 
     SpawnAsteroids();
-    HandleCollisions(deltaTime); // and update asteroids
+    HandleCollisions(deltaTime);
 }
 
 void Game::Update(float simSpeed)
 {
+    // Use GetFrameTime() when a window is open, fixed timestep otherwise
+    float dt = draw ? GetFrameTime() : fixedTimestep;
+    float scaledDt = simSpeed * dt;
+
     if (player->IsAlive())
     {
-        // this will cause a problem if draw is set to false
-        controller->Update(simSpeed * GetFrameTime());
-        player->Update(simSpeed * GetFrameTime());
-
-        // controller->Update(simSpeed * GetFrameTime());
-        // player->Update(simSpeed * GetFrameTime());
+        controller->Update(scaledDt);
+        player->Update(scaledDt);
     }
 
-    HandleAsteroids(simSpeed * GetFrameTime());
+    HandleAsteroids(scaledDt);
 }
 
 void Game::Draw()
 {
     if (draw)
     {
-        BeginDrawing();
-        ClearBackground(backgroundColor);
+        // When we own the window, manage the full frame ourselves.
+        // When main owns the window (training mode), just draw game content -
+        // main handles BeginDrawing/EndDrawing so it can add the stats panel.
+        if (ownsWindow)
+        {
+            BeginDrawing();
+            ClearBackground(backgroundColor);
+        }
+
         player->Draw();
         for (const auto &asteroid : asteroids)
         {
@@ -231,6 +234,9 @@ void Game::Draw()
 
         DrawText(TextFormat("SCORE: %i", score), 50, 50, 24, RAYWHITE);
 
-        EndDrawing();
+        if (ownsWindow)
+        {
+            EndDrawing();
+        }
     }
 }
