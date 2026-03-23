@@ -11,11 +11,9 @@ int Simulation::GetScore()
     return game->GetScore();
 }
 
-int Simulation::GetLifeSpan()
+float Simulation::GetLifeSpan()
 {
-    auto currentTime = std::chrono::system_clock::now();
-    std::chrono::duration<double> elapsed_seconds = currentTime - simsStartTime;
-    return elapsed_seconds.count();
+    return game->GetGameTime();
 }
 
 int Simulation::GetHitrate()

@@ -135,24 +135,20 @@ void NeuralNetwork::crossover(NeuralNetwork &other)
     }
 }
 
-// Crossover operation on a neuron using blending crossover
+// Crossover operation on a neuron using uniform crossover (swap, don't blend)
 void NeuralNetwork::crossoverNeuron(Neuron &neuron, const Neuron &other)
 {
     for (size_t i = 0; i < neuron.inputWeights.size(); i++)
     {
         if (shouldCrossover())
         {
-            double alpha = Config::Network::CROSSOVER_BLEND_ALPHA;
-            double newWeight = alpha * neuron.inputWeights[i] + (1 - alpha) * other.inputWeights[i];
-            neuron.inputWeights[i] = newWeight;
+            neuron.inputWeights[i] = other.inputWeights[i];
         }
     }
 
     if (shouldCrossover())
     {
-        double alpha = Config::Network::CROSSOVER_BLEND_ALPHA;
-        double newBias = alpha * neuron.inputBias + (1 - alpha) * other.inputBias;
-        neuron.inputBias = newBias;
+        neuron.inputBias = other.inputBias;
     }
 }
 

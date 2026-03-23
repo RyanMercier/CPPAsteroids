@@ -62,14 +62,13 @@ namespace Config
         constexpr int SIMS_PER_GENERATION = 10;
         constexpr float SIM_SPEED = 1.0f;
         constexpr float RAYCAST_MAX_DIST = 1000.0f;
-        constexpr float FITNESS_DIVISOR = 1000000.0f;
     }
 
     namespace Network
     {
-        constexpr float MUTATION_DELTA_SCALE = 0.1f;
-        constexpr float WEIGHT_CLIP = 1.0f;
-        constexpr double CROSSOVER_BLEND_ALPHA = 0.7;
+        constexpr float MUTATION_DELTA_SCALE = 0.3f;
+        constexpr float WEIGHT_CLIP = 3.0f;
+        constexpr int TOURNAMENT_SIZE = 5;
     }
 
     namespace Graph

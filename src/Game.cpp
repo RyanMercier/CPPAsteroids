@@ -81,13 +81,12 @@ void Game::Close()
     }
 }
 
-void Game::SpawnAsteroids()
+void Game::SpawnAsteroids(float deltaTime)
 {
-    if (asteroids.size() < maxAsteroids)
+    asteroidSpawnTimer += deltaTime;
+    if ((int)asteroids.size() < maxAsteroids)
     {
-        auto currentTime = std::chrono::system_clock::now();
-        std::chrono::duration<double> elapsed_seconds = currentTime - lastAsteroidTime;
-        if (elapsed_seconds.count() >= asteroidUpdateTime)
+        if (asteroidSpawnTimer >= asteroidUpdateTime)
         {
             int buf = (int)Config::Asteroid::SPAWN_BUFFER;
             int exc = (int)Config::Asteroid::SPAWN_EXCLUSION;
@@ -100,7 +99,7 @@ void Game::SpawnAsteroids()
             }
 
             asteroids.push_back(new Asteroid(Vector2{xPos, yPos}, GetRandomValue(-90, 90), GetRandomValue(50, 300), GetRandomValue(10, 100)));
-            lastAsteroidTime = currentTime;
+            asteroidSpawnTimer = 0.0f;
         }
     }
 }
@@ -194,8 +193,13 @@ void Game::HandleAsteroids(float deltaTime)
         maxAsteroids++;
     }
 
-    SpawnAsteroids();
+    SpawnAsteroids(deltaTime);
     HandleCollisions(deltaTime);
+}
+
+float Game::GetGameTime()
+{
+    return gameTime;
 }
 
 void Game::Update(float simSpeed)
@@ -203,6 +207,7 @@ void Game::Update(float simSpeed)
     // Use GetFrameTime() when a window is open, fixed timestep otherwise
     float dt = draw ? GetFrameTime() : fixedTimestep;
     float scaledDt = simSpeed * dt;
+    gameTime += scaledDt;
 
     if (player->IsAlive())
     {

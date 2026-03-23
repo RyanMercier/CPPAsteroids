@@ -55,7 +55,7 @@ public:
 
             if (shoot)
             {
-                player->Shoot();
+                player->Shoot(_deltaTime);
             }
         }
     }

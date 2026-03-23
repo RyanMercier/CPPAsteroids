@@ -2,7 +2,6 @@
 #define SHIP_H
 
 #include <vector>
-#include <chrono>
 #include "raylib.h"
 #include "raymath.h"
 #include "Config.h"
@@ -26,7 +25,7 @@ class Ship
 
     // bullet control
     float shotsPerSecond = Config::Ship::SHOTS_PER_SECOND;
-    std::chrono::system_clock::time_point lastShotTime = std::chrono::system_clock::now();
+    float shotCooldownTimer = 0.0f;
     std::vector<Projectile *> bullets;
 
     int shotsFired = 0;
@@ -93,7 +92,7 @@ public:
 
     void TurnRight(float _deltaTime);
 
-    void Shoot();
+    void Shoot(float _deltaTime);
 
     void HandleScreenWrap();
 

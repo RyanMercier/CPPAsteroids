@@ -112,17 +112,13 @@ void Ship::Move(float _deltaTime)
     }
 }
 
-void Ship::Shoot()
+void Ship::Shoot(float _deltaTime)
 {
-    // check fire rate
-    float shotTime = 1.0f / shotsPerSecond / simSpeed;
-    auto currentTime = std::chrono::system_clock::now();
-
-    std::chrono::duration<double> elapsed_seconds = currentTime - lastShotTime;
-    if (elapsed_seconds.count() > shotTime)
+    shotCooldownTimer -= _deltaTime;
+    if (shotCooldownTimer <= 0.0f)
     {
         bullets.push_back(new Projectile(position, rotation));
-        lastShotTime = currentTime;
+        shotCooldownTimer = 1.0f / shotsPerSecond;
         shotsFired++;
     }
 }

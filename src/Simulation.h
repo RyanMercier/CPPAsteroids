@@ -3,7 +3,6 @@
 
 #include <memory>
 #include <vector>
-#include <chrono>
 #include "raylib.h"
 #include "Game.h"
 #include "NetworkController.h"
@@ -17,8 +16,6 @@ class Simulation
     int rayCount = 0;
     std::vector<double> inputs;
     float *simSpeedPtr;
-
-    std::chrono::system_clock::time_point simsStartTime = std::chrono::system_clock::now();
 
 public:
     Simulation(std::unique_ptr<NeuralNetwork> _network, int _rayCount, bool _draw, float *_simSpeedPtr, bool _ownsWindow = true)
@@ -38,7 +35,7 @@ public:
 
     int GetScore();
 
-    int GetLifeSpan();
+    float GetLifeSpan();
 
     int GetHitrate();
 

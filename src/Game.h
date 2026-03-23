@@ -2,7 +2,6 @@
 #define GAME_H
 
 #include <vector>
-#include <chrono>
 #include <memory>
 #include <algorithm>
 #include <raylib.h>
@@ -23,13 +22,14 @@ class Game
     int maxAsteroids = Config::Asteroid::INITIAL_MAX;
     int lastDifficultyScore = 0;
     double asteroidUpdateTime = Config::Asteroid::SPAWN_INTERVAL;
-    std::chrono::system_clock::time_point lastAsteroidTime = std::chrono::system_clock::now();
+    float asteroidSpawnTimer = 0.0f;
 
     std::unique_ptr<Controller> controller;
     std::unique_ptr<Ship> player;
     std::vector<Asteroid *> asteroids;
 
     int score = 0;
+    float gameTime = 0.0f; // accumulated game-time in seconds
 
     // For non-drawn sims, use a fixed timestep instead of GetFrameTime()
     float fixedTimestep = 1.0f / 60.0f;
@@ -92,6 +92,7 @@ public:
     int GetScore();
     float GetHitrate();
     int GetShotsFired();
+    float GetGameTime();
 
     void Initialize();
 
@@ -99,7 +100,7 @@ public:
 
     void Close();
 
-    void SpawnAsteroids();
+    void SpawnAsteroids(float deltaTime);
 
     void HandleCollisions(float deltaTime);
 

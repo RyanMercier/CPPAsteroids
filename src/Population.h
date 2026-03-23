@@ -31,6 +31,8 @@ public:
 
     void Reproduce();
 
+    NeuralNetwork &TournamentSelect();
+
     NeuralNetwork GetBestNet();
 
     double GetRandomInt(int min, int max);

@@ -113,7 +113,7 @@ float CalculateFitness(const std::unique_ptr<Simulation> &sim)
     float fitness = (sim->GetScore() + 1) * 10;
     fitness *= sim->GetLifeSpan();
     fitness *= sim->GetHitrate() * sim->GetHitrate();
-    return fitness / Config::Training::FITNESS_DIVISOR;
+    return fitness;
 }
 
 // Draws the fitness graph in the stats panel.
@@ -239,7 +239,7 @@ void DrawStatsPanel(int generation, int simRound,
     {
         DrawText(TextFormat("Kills        %d", bestSim->GetScore()), x, y, 16, GREEN);
         y += 22;
-        DrawText(TextFormat("Time Alive   %d s", bestSim->GetLifeSpan()), x, y, 16, YELLOW);
+        DrawText(TextFormat("Time Alive   %.1f s", bestSim->GetLifeSpan()), x, y, 16, YELLOW);
         y += 22;
         DrawText(TextFormat("Shots Fired  %d", bestSim->GetShotsFired()), x, y, 16, LIGHTGRAY);
         y += 22;

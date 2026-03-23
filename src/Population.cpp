@@ -1,43 +1,47 @@
 #include "Population.h"
+#include "Config.h"
+
+NeuralNetwork &Population::TournamentSelect()
+{
+    int bestIdx = (int)GetRandomInt(0, size);
+    for (int i = 1; i < Config::Network::TOURNAMENT_SIZE; i++)
+    {
+        int idx = (int)GetRandomInt(0, size);
+        if (networks[idx].fitness > networks[bestIdx].fitness)
+        {
+            bestIdx = idx;
+        }
+    }
+    return networks[bestIdx];
+}
 
 void Population::Reproduce()
 {
-    // Select parents for reproduction
-    // Sort by fitness and keep the best half
     std::sort(networks.begin(), networks.end());
     std::vector<NeuralNetwork> newGeneration;
 
-    // Move Elites to new generation (top 25%)
-    for (int i = size * 3 / 4; i < size; i++)
+    // Elites: keep top 5% unchanged
+    int eliteCount = std::max(1, size / 20);
+    for (int i = size - eliteCount; i < size; i++)
     {
         NeuralNetwork elite = networks[i];
         elite.fitness = 0;
         newGeneration.push_back(elite);
     }
 
-    // Create new generation through crossover and mutation
-    // Select parents from top half only (networks is sorted ascending)
-    int topHalfStart = size / 2;
-    while (newGeneration.size() < size)
+    // Fill the rest via tournament selection + crossover + mutation
+    while ((int)newGeneration.size() < size)
     {
-        NeuralNetwork parent1 = networks[(int)GetRandomInt(topHalfStart, size)];
-        NeuralNetwork parent2 = networks[(int)GetRandomInt(topHalfStart, size)];
+        NeuralNetwork offspring = TournamentSelect();
+        NeuralNetwork &parent2 = TournamentSelect();
 
-        NeuralNetwork offspring1 = parent1;
-        NeuralNetwork offspring2 = parent2;
+        offspring.crossover(parent2);
+        offspring.mutate();
+        offspring.fitness = 0;
 
-        offspring1.crossover(parent2);
-        offspring1.mutate();
-        offspring1.fitness = 0;
-        offspring2.crossover(parent1);
-        offspring2.mutate();
-        offspring2.fitness = 0;
-
-        newGeneration.push_back(offspring1);
-        newGeneration.push_back(offspring2);
+        newGeneration.push_back(offspring);
     }
 
-    // Replace old population with new generation
     networks = newGeneration;
 }
 

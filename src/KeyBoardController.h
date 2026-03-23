@@ -37,7 +37,7 @@ public:
 
         if (IsKeyDown(KEY_SPACE))
         {
-            player->Shoot();
+            player->Shoot(_deltaTime);
         }
     }
 };
