@@ -209,18 +209,28 @@ int Game::GetFramesSurvived()
 
 void Game::Update(float simSpeed)
 {
-    // Always use fixed timestep so physics is identical for all sims
-    float scaledDt = simSpeed * fixedTimestep;
-    gameTime += scaledDt;
-    frameSurvived++;
+    // Substep physics so high simSpeed doesn't break collisions.
+    // Each substep uses at most 1x timestep to keep bullet/asteroid
+    // movement small enough for reliable collision detection.
+    int steps = (int)std::ceil(simSpeed);
+    float substepDt = (simSpeed * fixedTimestep) / steps;
 
-    if (player->IsAlive())
+    for (int s = 0; s < steps; s++)
     {
-        controller->Update(scaledDt);
-        player->Update(scaledDt);
+        gameTime += substepDt;
+
+        if (player->IsAlive())
+        {
+            // Only read controller input on the first substep
+            if (s == 0)
+                controller->Update(substepDt);
+            player->Update(substepDt);
+        }
+
+        HandleAsteroids(substepDt);
     }
 
-    HandleAsteroids(scaledDt);
+    frameSurvived++;
 }
 
 void Game::Draw()
