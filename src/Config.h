@@ -57,7 +57,7 @@ namespace Config
         constexpr int EXTRA_INPUTS = 5; // rotation, pos x/y, vel x/y
         constexpr double MUTATION_RATE = 0.1;
         constexpr double CROSSOVER_RATE = 0.7;
-        constexpr int POPULATION_SIZE = 500;
+        constexpr int POPULATION_SIZE = 1000;
         constexpr int NUM_GENERATIONS = 200;
         constexpr int SIMS_PER_GENERATION = 15;
         constexpr float SIM_SPEED = 1.0f;

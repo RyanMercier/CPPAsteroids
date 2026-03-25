@@ -209,9 +209,8 @@ int Game::GetFramesSurvived()
 
 void Game::Update(float simSpeed)
 {
-    // Use GetFrameTime() when a window is open, fixed timestep otherwise
-    float dt = draw ? GetFrameTime() : fixedTimestep;
-    float scaledDt = simSpeed * dt;
+    // Always use fixed timestep so physics is identical for all sims
+    float scaledDt = simSpeed * fixedTimestep;
     gameTime += scaledDt;
     frameSurvived++;
 
