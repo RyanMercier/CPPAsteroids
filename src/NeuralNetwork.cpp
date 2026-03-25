@@ -99,24 +99,39 @@ void NeuralNetwork::mutateNeuron(Neuron &neuron)
     {
         if (shouldMutate())
         {
-            float deltaWeight = randomWeight() * Config::Network::MUTATION_DELTA_SCALE;
-            neuron.inputWeights[i] += deltaWeight;
-
-            if (neuron.inputWeights[i] > Config::Network::WEIGHT_CLIP || neuron.inputWeights[i] < -Config::Network::WEIGHT_CLIP)
+            // Small chance to fully reset the weight
+            if (randomChance() < Config::Network::WEIGHT_RESET_CHANCE)
             {
-                neuron.inputWeights[i] -= 2.0f * deltaWeight;
+                neuron.inputWeights[i] = randomWeight();
+            }
+            else
+            {
+                float deltaWeight = randomWeight() * Config::Network::MUTATION_DELTA_SCALE;
+                neuron.inputWeights[i] += deltaWeight;
+
+                if (neuron.inputWeights[i] > Config::Network::WEIGHT_CLIP || neuron.inputWeights[i] < -Config::Network::WEIGHT_CLIP)
+                {
+                    neuron.inputWeights[i] -= 2.0f * deltaWeight;
+                }
             }
         }
     }
 
     if (shouldMutate())
     {
-        float deltaBias = randomBias() * Config::Network::MUTATION_DELTA_SCALE;
-        neuron.inputBias += deltaBias;
-
-        if (neuron.inputBias > Config::Network::WEIGHT_CLIP || neuron.inputBias < -Config::Network::WEIGHT_CLIP)
+        if (randomChance() < Config::Network::WEIGHT_RESET_CHANCE)
         {
-            neuron.inputBias -= 2.0f * deltaBias;
+            neuron.inputBias = randomBias();
+        }
+        else
+        {
+            float deltaBias = randomBias() * Config::Network::MUTATION_DELTA_SCALE;
+            neuron.inputBias += deltaBias;
+
+            if (neuron.inputBias > Config::Network::WEIGHT_CLIP || neuron.inputBias < -Config::Network::WEIGHT_CLIP)
+            {
+                neuron.inputBias -= 2.0f * deltaBias;
+            }
         }
     }
 }
@@ -169,6 +184,14 @@ double NeuralNetwork::randomBias()
     static std::random_device rd;
     static std::mt19937 gen(rd());
     std::uniform_real_distribution<> dis(-1.0, 1.0);
+    return dis(gen);
+}
+
+double NeuralNetwork::randomChance()
+{
+    static std::random_device rd;
+    static std::mt19937 gen(rd());
+    std::uniform_real_distribution<> dis(0.0, 1.0);
     return dis(gen);
 }
 

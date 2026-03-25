@@ -51,22 +51,23 @@ namespace Config
 
     namespace Training
     {
-        constexpr int RAY_COUNT = 12;
-        constexpr int HIDDEN_NEURONS = 32;
+        constexpr int RAY_COUNT = 24;
+        constexpr int HIDDEN_NEURONS = 48;
         constexpr int NUM_OUTPUTS = 4;
         constexpr int EXTRA_INPUTS = 5; // rotation, pos x/y, vel x/y
-        constexpr double MUTATION_RATE = 0.05;
+        constexpr double MUTATION_RATE = 0.1;
         constexpr double CROSSOVER_RATE = 0.7;
         constexpr int POPULATION_SIZE = 500;
         constexpr int NUM_GENERATIONS = 200;
-        constexpr int SIMS_PER_GENERATION = 10;
+        constexpr int SIMS_PER_GENERATION = 15;
         constexpr float SIM_SPEED = 1.0f;
         constexpr float RAYCAST_MAX_DIST = 1000.0f;
     }
 
     namespace Network
     {
-        constexpr float MUTATION_DELTA_SCALE = 0.3f;
+        constexpr float MUTATION_DELTA_SCALE = 0.5f;
+        constexpr float WEIGHT_RESET_CHANCE = 0.02f; // chance to fully randomize a weight
         constexpr float WEIGHT_CLIP = 3.0f;
         constexpr int TOURNAMENT_SIZE = 5;
     }

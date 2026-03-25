@@ -269,7 +269,7 @@ SRC_DIR = src
 OBJ_DIR = obj
 
 SRC = $(wildcard $(SRC_DIR)/*.cpp)
-SRC += $(wildcard $(SRC_DIR)/*.h)
+HDRS = $(wildcard $(SRC_DIR)/*.h)
 OBJS = $(SRC:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 
 ifeq ($(PLATFORM),PLATFORM_ANDROID)
@@ -286,7 +286,7 @@ all:
 $(PROJECT_NAME): $(OBJS)
 	$(CC) -o $(PROJECT_NAME)$(EXT) $(OBJS) $(CFLAGS) $(INCLUDE_PATHS) $(LDFLAGS) $(LDLIBS) -D$(PLATFORM)
 
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp $(HDRS)
 	$(CC) -c $< -o $@ $(CFLAGS) $(INCLUDE_PATHS) -D$(PLATFORM)
 
 clean:
@@ -295,7 +295,7 @@ ifeq ($(PLATFORM),PLATFORM_DESKTOP)
 		rm $(OBJS) $(PROJECT_NAME)$(EXT)
     endif
     ifeq ($(PLATFORM_OS),LINUX)
-	find -type f -executable | xargs file -i | grep -E 'x-object|x-archive|x-sharedlib|x-executable' | rev | cut -d ':' -f 2- | rev | xargs rm -fv
+	rm -fv $(OBJS) $(PROJECT_NAME)$(EXT)
     endif
     ifeq ($(PLATFORM_OS),OSX)
 		rm -f $(OBJS) $(PROJECT_NAME)$(EXT)

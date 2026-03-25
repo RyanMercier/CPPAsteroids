@@ -71,6 +71,8 @@ public:
     // Generate a random bias
     double randomBias();
 
+    double randomChance();
+
     // Determine if a mutation should occur based on mutation rate
     bool shouldMutate();
 

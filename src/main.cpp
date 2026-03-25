@@ -110,10 +110,16 @@ NeuralNetwork LoadFromFile(const std::string &filePath)
 
 float CalculateFitness(const std::unique_ptr<Simulation> &sim)
 {
-    float fitness = (sim->GetScore() + 1) * 10;
-    fitness *= sim->GetLifeSpan();
-    fitness *= sim->GetHitrate() * sim->GetHitrate();
-    return fitness;
+    // Use frame count so sim speed slider doesn't affect fitness
+    float survival = sim->GetFramesSurvived();
+    float kills = sim->GetScore() * 100.0f;
+
+    // Accuracy bonus only if the ship actually shoots
+    float accuracyBonus = 1.0f;
+    if (sim->GetShotsFired() > 0)
+        accuracyBonus = 1.0f + sim->GetHitrate();
+
+    return (survival + kills) * accuracyBonus;
 }
 
 // Draws the fitness graph in the stats panel.

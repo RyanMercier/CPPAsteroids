@@ -16,7 +16,7 @@ float Simulation::GetLifeSpan()
     return game->GetGameTime();
 }
 
-int Simulation::GetHitrate()
+float Simulation::GetHitrate()
 {
     return game->GetHitrate();
 }
@@ -24,6 +24,11 @@ int Simulation::GetHitrate()
 int Simulation::GetShotsFired()
 {
     return game->GetShotsFired();
+}
+
+int Simulation::GetFramesSurvived()
+{
+    return game->GetFramesSurvived();
 }
 
 void Simulation::Update()

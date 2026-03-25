@@ -37,9 +37,11 @@ public:
 
     float GetLifeSpan();
 
-    int GetHitrate();
+    float GetHitrate();
 
     int GetShotsFired();
+
+    int GetFramesSurvived();
 
     std::vector<double> GetAsteroidInputs(Vector2 playerPos);
 };

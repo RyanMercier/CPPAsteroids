@@ -30,6 +30,7 @@ class Game
 
     int score = 0;
     float gameTime = 0.0f; // accumulated game-time in seconds
+    int frameSurvived = 0; // frame count for speed-independent fitness
 
     // For non-drawn sims, use a fixed timestep instead of GetFrameTime()
     float fixedTimestep = 1.0f / 60.0f;
@@ -93,6 +94,7 @@ public:
     float GetHitrate();
     int GetShotsFired();
     float GetGameTime();
+    int GetFramesSurvived();
 
     void Initialize();
 

@@ -202,12 +202,18 @@ float Game::GetGameTime()
     return gameTime;
 }
 
+int Game::GetFramesSurvived()
+{
+    return frameSurvived;
+}
+
 void Game::Update(float simSpeed)
 {
     // Use GetFrameTime() when a window is open, fixed timestep otherwise
     float dt = draw ? GetFrameTime() : fixedTimestep;
     float scaledDt = simSpeed * dt;
     gameTime += scaledDt;
+    frameSurvived++;
 
     if (player->IsAlive())
     {
