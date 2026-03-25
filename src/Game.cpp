@@ -221,9 +221,7 @@ void Game::Update(float simSpeed)
 
         if (player->IsAlive())
         {
-            // Only read controller input on the first substep
-            if (s == 0)
-                controller->Update(substepDt);
+            controller->Update(substepDt);
             player->Update(substepDt);
         }
 
